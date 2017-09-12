@@ -17,7 +17,7 @@ def AuthLoop():
     if not swipeThread.isAlive():
         swipeThread.start()
         chatThread.start()
-    features.sleep(1800)
+    features.sleep(random.randint(1000,2000))
 
 def ChatLoop():
     while(True):
@@ -25,7 +25,7 @@ def ChatLoop():
             print("Chat loop is waiting for matches... we currently have none :(")
         else:
             print("WE HAVE A MATCH")
-        features.sleep(60)
+        features.sleep(random.randint(30,90))
 
 
 
