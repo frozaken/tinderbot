@@ -99,11 +99,16 @@ if __name__ == "__main__":
 
     #vores threads
     authThread = Thread(target = AuthLoop)
+    authThread.daemon = True
     swipeThread = Thread(target=SwipeLoop)
+    swipeThread.daemon = True
     chatThread = Thread(target=ChatLoop)
+    chatThread.daemon = True
     authThread.start()
     swipeThread.start()
     chatThread.start()
+    while threading.active_count() > 1:
+        features.sleep(1)
 
 
 
