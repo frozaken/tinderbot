@@ -9,17 +9,7 @@ import time
 
 
 def main():
-    auth = tinder_api.get_auth_token(config.fb_access_token,config.fb_user_id)
-    timeToNextAuth = time.time() * 1000 + 1800000
-    features.sleep(1)
-    tinder_api.reset_real_location()
-    features.sleep(1)
-    tinder_api.change_preferences(age_filter_min = 18,age_filter_max = 22,distance_filter=30)
-    print("Updated age settings")
-    features.sleep(1)
-    matches = len(features.get_match_info())
     ids=[]
-    numberofswipes = 1
     pause = False
 
     timeToNextAuth = 0
@@ -30,6 +20,7 @@ def main():
             print("Reauthorizing")
             tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
             timeToNextAuth = time.time()*1000 + 1800000
+            #tinder_api.change_preferences(age_filter_min = 18,age_filter_max = 22,distance_filter=30)
 
         if(not pause):
             if (len(ids) == 0):
