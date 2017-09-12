@@ -114,8 +114,7 @@ if __name__ == "__main__":
             features.sleep(1)
 
     except KeyboardInterrupt:
-        print("Thank you, please come again :)")
-        sys.exit(1)
+        sys.exit("Thank you, please come again :)")
 
 
 
