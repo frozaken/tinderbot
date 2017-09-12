@@ -46,9 +46,10 @@ def main():
             ids = ids[1:len(ids)-2]
         if(timeToNextLike>time.time()*1000):
             pause = True
-            print("Taking a break for 10 seconds.. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
+            breaktime = random.randint(60,600)
+            print("Taking a break for " +str(breaktime) + " seconds.. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
             print("We have this many matches: " + str(len(UpdateMatches())))
-            features.sleep(10)
+            features.sleep(breaktime)
         else:
             pause = False
         features.sleep(random.randrange(1,2))
