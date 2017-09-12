@@ -36,7 +36,7 @@ def ChatLoop():
             print("Chat loop is waiting for matches... we currently have none :(")
         else:
             print("WE HAVE A MATCH")
-        features.sleep(random.randint(30,90))
+        features.sleep(random.randint(600,6000))
 
 
 
