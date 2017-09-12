@@ -114,7 +114,7 @@ if __name__ == "__main__":
             features.sleep(1)
 
     except KeyboardInterrupt:
-        print("WHY DO YOU LEAVE ME??")
+        print("\nWHY DO YOU LEAVE ME??")
         sys.exit(0)
 
 
