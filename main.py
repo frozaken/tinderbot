@@ -39,7 +39,7 @@ def main():
             pause = True
             breaktime = random.randint(60,600)
             print("Taking a break for " +str(breaktime) + " seconds.. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
-            print("We have this many matches: " + str(len(UpdateMatches())))
+            print("We have this many matches *wink*: " + str(len(UpdateMatches())))
             features.sleep(breaktime)
         else:
             pause = False
