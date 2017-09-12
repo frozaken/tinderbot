@@ -21,7 +21,6 @@ def main():
     numberofswipes = 1
     pause = False
     while True:
-        print("Pause: " + str(pause))
         if(not pause):
             if (len(ids) == 0):
                 ids = GetIds()
