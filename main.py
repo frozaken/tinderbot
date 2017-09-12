@@ -15,7 +15,7 @@ def AuthLoop():
     while(True):
         #authCond.wait()
         print('Authorizing')
-        #sætter authorized til false
+        #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
         #authorized = true
