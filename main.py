@@ -8,6 +8,8 @@ import random
 import time
 from threading import Thread
 import threading
+import sys;
+
 
 authorized = False
 
@@ -93,22 +95,27 @@ def findIDs(data):
 
 
 if __name__ == "__main__":
-    authorized = threading.Event()
-    #vi er ikke authorized
-    authorized.clear()
+    try:
+        authorized = threading.Event()
+        #vi er ikke authorized
+        authorized.clear()
 
-    #vores threads
-    authThread = Thread(target = AuthLoop)
-    authThread.daemon = True
-    swipeThread = Thread(target=SwipeLoop)
-    swipeThread.daemon = True
-    chatThread = Thread(target=ChatLoop)
-    chatThread.daemon = True
-    authThread.start()
-    swipeThread.start()
-    chatThread.start()
-    while threading.active_count() > 1:
-        features.sleep(1)
+        #vores threads
+        authThread = Thread(target = AuthLoop)
+        authThread.daemon = True
+        swipeThread = Thread(target=SwipeLoop)
+        swipeThread.daemon = True
+        chatThread = Thread(target=ChatLoop)
+        chatThread.daemon = True
+        authThread.start()
+        swipeThread.start()
+        chatThread.start()
+        while threading.active_count() > 1:
+            features.sleep(1)
+
+    except KeyboardInterrupt:
+        sys.exit(1)
+
 
 
 
