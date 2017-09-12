@@ -10,14 +10,15 @@ from threading import Thread
 
 
 def AuthLoop():
-    print('Authorizing')
-    tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
-    timeToNextAuth = time.time() * 1000 + 1800000
-    tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
-    if not swipeThread.isAlive():
-        swipeThread.start()
-        chatThread.start()
-    features.sleep(random.randint(1000,2000))
+    while(True):
+        print('Authorizing')
+        tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
+        timeToNextAuth = time.time() * 1000 + 1800000
+        tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
+        if not swipeThread.isAlive():
+            swipeThread.start()
+            chatThread.start()
+        features.sleep(random.randint(1000,2000))
 
 def ChatLoop():
     while(True):
