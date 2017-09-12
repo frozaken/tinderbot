@@ -25,14 +25,16 @@ def main():
         if(not pause):
             if (len(ids) == 0):
                 ids = GetIds()
-
-            print("Swiped " + str(ids[len(ids)-1]))
-            returndata = tinder_api.like(ids[len(ids)-1])
+            if(random.randInt(0,3)!=0):
+                returndata = tinder_api.like(ids[len(ids)-1])
+                print("Liked " + str(ids[len(ids) - 1]))
+            else:
+                returndata = tinder_api.dislike(ids[len(ids) - 1])
+                print("Dislked " + str(ids[len(ids) - 1]))
             ids = ids[1:len(ids)-2]
             numberofswipes = int(returndata['likes_remaining'])
             timeToNext = returndata['rate_limited_until']
             print("Number of swipes remaining: " + str(numberofswipes))
-
         if(timeToNext>time.time()*1000):
             pause = True
             print("Taking a break. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNext))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNext))))/60%60))+ " minutes")
