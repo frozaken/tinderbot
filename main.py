@@ -25,7 +25,7 @@ def main():
         if(not pause):
             if (len(ids) == 0):
                 ids = GetIds()
-            if(random.randint(0,3)!=0):
+            if(random.randint(0,15)!=0):
                 returndata = tinder_api.like(ids[len(ids)-1])
                 print("Liked " + str(ids[len(ids) - 1]))
                 numberofswipes = int(returndata['likes_remaining'])
