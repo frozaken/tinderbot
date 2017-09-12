@@ -27,7 +27,7 @@ def AuthLoop():
 def ChatLoop():
 
     while(True):
-        #venter på vi er authorized
+        #venter paa vi er authorized
         authorized.wait()
 
         if len(UpdateMatches()) == 0:
@@ -45,7 +45,7 @@ def SwipeLoop():
     timeToNextAuth = 0
     timeToNextLike = 0
     while True:
-        #vi venter på vi er authorized
+        #vi venter paa vi er authorized
         authorized.wait()
         if (len(ids) == 0):
             ids = GetIds()
