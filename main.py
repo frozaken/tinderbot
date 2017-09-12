@@ -6,9 +6,30 @@ import json
 from collections import namedtuple
 import random
 import time
+from threading import Thread
 
 
-def main():
+def AuthLoop():
+    print('Authorizing')
+    tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
+    timeToNextAuth = time.time() * 1000 + 1800000
+    tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
+    if not swipeThread.isAlive():
+        swipeThread.start()
+        chatThread.start()
+    features.sleep(1800)
+
+def ChatLoop():
+    while(True):
+        if len(UpdateMatches()) == 0:
+            print("Chat loop is waiting for matches... we currently have none :(")
+        else:
+            print("WE HAVE A MATCH")
+        features.sleep(60)
+
+
+
+def SwipeLoop():
     ids=[]
     pause = False
 
@@ -16,12 +37,6 @@ def main():
     timeToNextLike = 0
 
     while True:
-        if(timeToNextAuth < time.time()*1000):
-            print('Authorizing')
-            tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
-            timeToNextAuth = time.time()*1000 + 1800000
-            tinder_api.change_preferences(age_filter_min = 18,age_filter_max = 22,distance_filter=30)
-
         if(not pause):
             if (len(ids) == 0):
                 ids = GetIds()
@@ -39,7 +54,6 @@ def main():
             pause = True
             breaktime = random.randint(60,600)
             print("Taking a break for " +str(breaktime) + " seconds.. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
-            print("We have this many matches *wink*: " + str(len(UpdateMatches())))
             features.sleep(breaktime)
         else:
             pause = False
@@ -67,5 +81,10 @@ def findIDs(data):
 
 
 if __name__ == "__main__":
-    main()
+    authThread = Thread(target = AuthLoop)
+    swipeThread = Thread(target=SwipeLoop)
+    chatThread = Thread(target=ChatLoop)
+    authThread.start()
+
+
 
