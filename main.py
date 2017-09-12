@@ -47,9 +47,13 @@ def SwipeLoop():
     while True:
         #vi venter paa vi er authorized
         authorized.wait()
+        #hvis vi ikke har flere at swipe
         if (len(ids) == 0):
+            #faar vi da bare nogle flere XD
             ids = GetIds()
+        #randomness for ikke kun at swipe hoejre
         if(random.randint(0,15)!=0):
+            #gaar igennem arrayet bagfra
             returndata = tinder_api.like(ids[len(ids)-1])
             print("Liked " + str(ids[len(ids) - 1]))
             numberofswipes = int(returndata['likes_remaining'])
@@ -59,6 +63,7 @@ def SwipeLoop():
             returndata = tinder_api.dislike(ids[len(ids) - 1])
             print("Dislked " + str(ids[len(ids) - 1]))
         ids = ids[1:len(ids)-2]
+        #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
             pause = True
             breaktime = random.randint(60,600)
