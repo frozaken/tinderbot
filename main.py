@@ -31,11 +31,11 @@ def ChatLoop():
     while(True):
         #venter paa vi er authorized
         authorized.wait()
-
+        matches = len(UpdateMatches())
         if len(UpdateMatches()) == 0:
             print("Chat loop is waiting for matches... we currently have none :(")
         else:
-            print("WE HAVE A MATCH")
+            print("We have this many matches: " + str(matches))
         features.sleep(random.randint(600,6000))
 
 
@@ -60,7 +60,7 @@ def SwipeLoop():
                 returndata = tinder_api.like(ids[len(ids)-1])
                 print("Liked " + str(ids[len(ids) - 1]))
                 numberofswipes = int(returndata['likes_remaining'])
-                timeToNextLike = returndata['rate_limited_until']
+                timeToNextLike = returndata.get('rate_limited_until',0)
                 print("Number of swipes remaining: " + str(numberofswipes))
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
