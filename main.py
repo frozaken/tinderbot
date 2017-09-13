@@ -61,10 +61,8 @@ def SendMessages(match):
 
 def SwipeLoop():
     ids=[]
-    pause = False
 
     numberofswipes = 1
-    timeToNextAuth = 0
     timeToNextLike = 0
     while True:
         #vi venter paa vi er authorized
@@ -87,9 +85,9 @@ def SwipeLoop():
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
-            breaktime = random.randint(60,600)
-            print("Taking a break for " +str(breaktime) + " seconds.. Im on a cooldown for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
-            features.sleep(breaktime)
+
+            print("Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
+            features.sleep(GetWaitSeconds(timeToNextLike))
         features.sleep(random.randrange(1,2))
 
 def UpdateMatches():
