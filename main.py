@@ -42,7 +42,9 @@ def ChatLoop():
             #SEND A MESSAGE :D
             for match in list(matches.values()):
                 SendMessages(match)
-        features.sleep(random.randint(600,1200))
+        sleeptime = random.randint(600,1200)
+        features.sleep(sleeptime)
+        print("Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds..")
 
 def SendMessages(match):
     msgarray = match['messages']
@@ -53,7 +55,7 @@ def SendMessages(match):
     if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
         print("I SHOULD RESPOND TO "+ match['name'])
     else:
-        print("Waiting for "+match['name']+" to respond.")
+        print("Waiting for "+match['name']+" to respond..")
 
 
 def SwipeLoop():
