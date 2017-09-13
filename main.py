@@ -127,7 +127,7 @@ if __name__ == "__main__":
         chatThread = Thread(target=ChatLoop)
         chatThread.daemon = True
         authThread.start()
-        #swipeThread.start()
+        swipeThread.start()
         chatThread.start()
         while threading.active_count() > 1:
             features.sleep(1)
