@@ -43,8 +43,9 @@ def ChatLoop():
             for match in list(matches.values()):
                 SendMessages(match)
         sleeptime = random.randint(600,1200)
-        features.sleep(sleeptime)
         print("Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds..")
+        features.sleep(sleeptime)
+
 
 def SendMessages(match):
     msgarray = match['messages']
