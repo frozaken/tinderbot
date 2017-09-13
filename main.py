@@ -55,7 +55,7 @@ def SwipeLoop():
             #faar vi da bare nogle flere XD
             ids = GetIds()
         if(numberofswipes > 0 or timeToNextLike>time.time()*1000):
-            if(random.randint(0,15)!=0):
+            if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1])
                 print("Liked " + str(ids[len(ids) - 1]))
