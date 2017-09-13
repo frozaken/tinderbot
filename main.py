@@ -76,8 +76,6 @@ def SwipeLoop():
 def UpdateMatches():
     return features.get_match_info()
 
-def SwipeRandom():
-
 
 def GetWaitSeconds(t):
     return (t-(time.time()*1000))/1000
