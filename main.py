@@ -31,13 +31,28 @@ def ChatLoop():
     while(True):
         #venter paa vi er authorized
         authorized.wait()
-        matches = len(UpdateMatches())
+        matches = UpdateMatches()
+        #print(matches)
         if len(UpdateMatches()) == 0:
             print("Chat loop is waiting for matches... we currently have none :(")
         else:
-            print("We have this many matches: " + str(matches))
+            print("We have this many matches: " + str(len(matches)))
+
+            #SEND A MESSAGE :D
+            for match in list(matches.values()):
+                SendMessages(match)
         features.sleep(random.randint(600,6000))
 
+def SendMessages(match):
+    msgarray = match['messages']
+    if(len(msgarray) == 0):
+        tinder_api.send_msg(match['match_id'], "Hej søde ;)")
+        print("SENT " + match['name'] + ": " + "Hej søde ;)")
+    #If we didn't send the message
+    if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
+        print("I SHOULD RESPOND TO "+ match['name'])
+    else:
+        print("Waiting for "+match['name']+" to respond.")
 
 
 def SwipeLoop():

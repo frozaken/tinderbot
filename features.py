@@ -28,7 +28,7 @@ def get_match_info():
                 "match_id": match['id'],  # This ID for messaging
                 "message_count": match['message_count'],
                 "photos": get_photos(person),
-                "bio": person['bio'],
+                "bio": person.get('bio','NO BIO'),
                 "gender": person['gender'],
                 "avg_successRate": get_avg_successRate(person),
                 "messages": match['messages'],
