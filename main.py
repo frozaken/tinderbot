@@ -50,11 +50,11 @@ def ChatLoop():
 def SendMessages(match):
     msgarray = match['messages']
     if(len(msgarray) == 0):
-        tinder_api.send_msg(match['match_id'], "Hej søde ;)")
-        print("SENT " + match['name'] + ": " + "Hej søde ;)")
+        tinder_api.send_msg(match['match_id'], "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
+        print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
     if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
-        print("I SHOULD RESPOND TO "+ match['name'])
+        print("I SHOULD RESPOND TO "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']))
     else:
         print("Waiting for "+match['name']+" to respond..")
 
@@ -71,7 +71,7 @@ def SwipeLoop():
         if (len(ids) == 0):
             #faar vi da bare nogle flere XD
             ids = GetIds()
-        if(numberofswipes > 0 or timeToNextLike>time.time()*1000):
+        if(numberofswipes > 0 or GetWaitSeconds(timeToNextLike)< 0):
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1])
