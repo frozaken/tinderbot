@@ -10,6 +10,7 @@ import time
 from threading import Thread
 import threading
 import sys;
+import re
 
 
 authorized = False
@@ -54,7 +55,7 @@ def SendMessages(match):
         print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
     if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
-        print("I SHOULD RESPOND TO "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']))
+        print("I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']))
     else:
         print("Waiting for "+match['name']+" to respond..")
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
         chatThread = Thread(target=ChatLoop)
         chatThread.daemon = True
         authThread.start()
-        swipeThread.start()
+        #swipeThread.start()
         chatThread.start()
         while threading.active_count() > 1:
             features.sleep(1)
