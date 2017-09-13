@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 import fb_auth_token;
 import config;
 import tinder_api;
