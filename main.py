@@ -42,7 +42,7 @@ def ChatLoop():
             #SEND A MESSAGE :D
             for match in list(matches.values()):
                 SendMessages(match)
-        features.sleep(random.randint(600,6000))
+        features.sleep(random.randint(600,1200))
 
 def SendMessages(match):
     msgarray = match['messages']
