@@ -10,7 +10,6 @@ import time
 from threading import Thread
 import threading
 import sys;
-import re
 
 
 authorized = False
@@ -55,9 +54,9 @@ def SendMessages(match):
         print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
     if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
-        print("I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']))
+        print("\033[92m {}\033[00m".format("I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message'])))
     else:
-        print("Waiting for "+match['name']+" to respond..")
+        print("\033[91m {}\033[00m".format("Waiting for "+match['name']+" to respond.."))
 
 
 def SwipeLoop():
