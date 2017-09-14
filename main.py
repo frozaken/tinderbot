@@ -10,12 +10,14 @@ import time
 from threading import Thread
 import threading
 import sys;
+import datetime as dt
 
 
 authorized = False
 
 def AuthLoop():
     while(True):
+        awake.wait()
         #authCond.wait()
         print('Authorizing')
         #saetter authorized til false
@@ -27,11 +29,25 @@ def AuthLoop():
         tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
         features.sleep(random.randint(1000,2000))
 
+
+def SleepLoop():
+
+    while(True):
+        if(dt.datetime.now().hour > 7):
+            print("We are awake")
+            awake.set()
+        else:
+            print("Sleeping ZzZZz, waking up at 7!")
+            awake.clear()
+
+        features.sleep(30*60)
+
 def ChatLoop():
 
     while(True):
         #venter paa vi er authorized
         authorized.wait()
+        awake.wait()
         matches = UpdateMatches()
         #print(matches)
         if len(UpdateMatches()) == 0:
@@ -67,6 +83,7 @@ def SwipeLoop():
     while True:
         #vi venter paa vi er authorized
         authorized.wait()
+        awake.wait()
         #hvis vi ikke har flere at swipe
         if (len(ids) == 0):
             #faar vi da bare nogle flere XD
@@ -115,9 +132,10 @@ def findIDs(data):
 if __name__ == "__main__":
     try:
         authorized = threading.Event()
+        awake = threading.Event()
         #vi er ikke authorized
         authorized.clear()
-
+        awake.clear()
         #vores threads
         authThread = Thread(target = AuthLoop)
         authThread.daemon = True
@@ -125,7 +143,10 @@ if __name__ == "__main__":
         swipeThread.daemon = True
         chatThread = Thread(target=ChatLoop)
         chatThread.daemon = True
+        bedThread = Thread(target=SleepLoop)
+        bedThread.daemon = True
         authThread.start()
+        bedThread.start()
         swipeThread.start()
         chatThread.start()
         while threading.active_count() > 1:
