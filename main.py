@@ -62,7 +62,7 @@ def ChatLoop():
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
             print(bcolors.OKBLUE + "We have this many matches: " + str(len(matches))+bcolors.ENDC)
-
+            tinder_api.change_preferences(bio = "Sød fyr der altid skriver først! Jeg har " + str(len(matches))+ " matches!")
             #SEND A MESSAGE :D
             for match in list(matches.values()):
                 SendMessages(match)
@@ -161,7 +161,7 @@ if __name__ == "__main__":
             features.sleep(1)
 
     except KeyboardInterrupt:
-        print("\nWHY DO YOU LEAVE ME??")
+        print("\n" + bcolors.FAIL+"WHY DO YOU LEAVE ME??"+bcolors.ENDC)
         sys.exit(0)
 
 
