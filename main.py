@@ -13,7 +13,16 @@ import sys;
 import datetime as dt
 
 
-authorized = False
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 def AuthLoop():
     while(True):
@@ -23,9 +32,7 @@ def AuthLoop():
         #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
-        #authorized = true
         authorized.set()
-        timeToNextAuth = time.time() * 1000 + 1800000
         tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
         features.sleep(random.randint(1000,2000))
 
@@ -35,10 +42,10 @@ def SleepLoop():
     while(True):
         #server er 2 timer bagud
         if int(dt.datetime.now().hour) >= 5:
-            print("We are awake")
+            print(bcolors.OKBLUE + "We are awake" + bcolors.ENDC)
             awake.set()
         else:
-            print("Sleeping ZzZZz, waking up at 7!")
+            print(bcolors.FAIL + "Sleeping ZzZZz, waking up at 7!" + bcolors.ENDC)
             awake.clear()
 
         features.sleep(30*60)
@@ -52,15 +59,15 @@ def ChatLoop():
         matches = UpdateMatches()
         #print(matches)
         if len(UpdateMatches()) == 0:
-            print("Chat loop is waiting for matches... we currently have none :(")
+            print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
-            print("We have this many matches: " + str(len(matches)))
+            print(bcolors.OKBLUE + "We have this many matches: " + str(len(matches))+bcolors.ENDC)
 
             #SEND A MESSAGE :D
             for match in list(matches.values()):
                 SendMessages(match)
         sleeptime = random.randint(600,1200)
-        print("Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds..")
+        print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
 
 
@@ -71,9 +78,9 @@ def SendMessages(match):
         print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
     if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
-        print("\033[92m {}\033[00m".format("I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message'])))
+        print(bcolors.OKGREEN+"I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']+bcolors.ENDC))
     else:
-        print("\033[91m {}\033[00m".format("Waiting for "+match['name']+" to respond.."))
+        print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
 
 
 def SwipeLoop():
@@ -93,18 +100,18 @@ def SwipeLoop():
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1])
-                print("Liked " + str(ids[len(ids) - 1]))
+                print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1])+bcolors.ENDC)
                 numberofswipes = int(returndata['likes_remaining'])
                 timeToNextLike = returndata.get('rate_limited_until',0)
-                print("Number of swipes remaining: " + str(numberofswipes))
+                print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
-                print("Dislked " + str(ids[len(ids) - 1]))
+                print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]) + bcolors.ENDC)
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
 
-            print("Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes")
+            print(bcolors.OKBLUE+ "Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes" + bcolors.ENDC)
             features.sleep(GetWaitSeconds(timeToNextLike))
         features.sleep(random.randrange(1,2))
 
