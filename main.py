@@ -33,8 +33,8 @@ def AuthLoop():
 def SleepLoop():
 
     while(True):
-        print("hour is "+str(dt.datetime.now().hour))
-        if int(dt.datetime.now().hour) > 7:
+        #server er 2 timer bagud
+        if int(dt.datetime.now().hour) >= 5:
             print("We are awake")
             awake.set()
         else:
