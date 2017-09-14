@@ -77,7 +77,7 @@ def SendMessages(match):
         tinder_api.send_msg(match['match_id'], "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
         print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
-    if(msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
+    elif( msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
         print(bcolors.OKGREEN+"I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']+bcolors.ENDC))
     else:
         print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
