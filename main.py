@@ -11,6 +11,7 @@ from threading import Thread
 import threading
 import sys;
 import datetime as dt
+import databasehandler as dbHandler
 
 
 
@@ -36,7 +37,6 @@ def AuthLoop():
         tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
         features.sleep(random.randint(1000,2000))
 
-
 def SleepLoop():
 
     while(True):
@@ -56,20 +56,40 @@ def ChatLoop():
         #venter paa vi er authorized
         authorized.wait()
         awake.wait()
-        matches = UpdateMatches()
-        #print(matches)
         if len(UpdateMatches()) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
-            print(bcolors.OKBLUE + "We have this many matches: " + str(len(matches))+bcolors.ENDC)
-            tinder_api.change_preferences(bio = "Sød fyr der altid skriver først! Jeg har " + str(len(matches))+ " matches!")
-            #SEND A MESSAGE :D
-            for match in list(matches.values()):
-                SendMessages(match)
+
+
+            unmatched = dbHandler.GetUnmatched()
+            matches = []
+            if(len(unmatched)>=2):
+                for i in range(0,(len(unmatched)//2)*2,2):
+                    matches.append([unmatched[i],unmatched[i+1]])
+            else:
+                print(bcolors.OKGREEN + "No new matches to be made this time" +bcolors.ENDC)
+            for match in matches:
+                print("Its a match!")
+                dbHandler.InsertPair(match[0],match[1])
+
+            allInternalMatches = dbHandler.GetAll()
+            for internal in allInternalMatches:
+                users = internal['users']
+                for i in range(0,2):
+                    msgFromUs = GetOurMessages(users[i]['uid'])
+                    features.sleep(1)
+                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'])
+                    features.sleep(1)
+                    msgToSend = GetDiffrenceArray(msgFromUs,msgFromThem)
+                    for msg in msgToSend:
+                        print("Sending: %s to %s"%(msg,users[i]['uid']))
+                        tinder_api.send_msg(users[i]['uid'],msg)
+                features.sleep(2)
+
+
         sleeptime = random.randint(600,1200)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
-
 
 def SendMessages(match):
     msgarray = match['messages']
@@ -77,11 +97,46 @@ def SendMessages(match):
         tinder_api.send_msg(match['match_id'], "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
         print("SENT " + match['name'] + ": " + "Er du et kamera? for jeg smiler hver gang jeg kigger på dig")
     #If we didn't send the message
-    elif( msgarray[len(msgarray)-1]['from'] != '59b7d9bcc3e6d4e6396db8e9'):
+    elif( msgarray[len(msgarray)-1]['from'] != config.myTinderID):
         print(bcolors.OKGREEN+"I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']+bcolors.ENDC))
     else:
         print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
 
+
+def GetForeignMessages(uid):
+    matches = UpdateMatches()
+    if(len(matches) == 0):
+        return
+    theirmsgs = []
+    for msg in matches[uid]['messages']:
+        if msg['from'] != config.myTinderID:
+            theirmsgs.append(msg['message'])
+    return theirmsgs
+
+def GetOurMessages(uid):
+    matches = UpdateMatches()
+    if(len(matches) == 0):
+        return
+    ourmsgs = []
+    for msg in matches[uid]['messages']:
+        if msg['from'] == config.myTinderID:
+            ourmsgs.append(msg['message'])
+    return ourmsgs
+
+def GetDiffrenceArray(A,B):
+    diff = []
+    for a in A:
+        if(not Search(B,a)):
+            diff.append(a)
+    return diff
+
+
+
+def Search(A,x):
+    for a in A:
+        if a == x:
+            return True
+    return False
 
 def SwipeLoop():
     ids=[]
@@ -118,7 +173,6 @@ def SwipeLoop():
 def UpdateMatches():
     return features.get_match_info()
 
-
 def GetWaitSeconds(t):
     return (t-(time.time()*1000))/1000
 
@@ -135,12 +189,12 @@ def FindUsers(data):
 
     return gizid
 
-
-
 if __name__ == "__main__":
     try:
+        dbHandler.ConnectToDB()
         authorized = threading.Event()
         awake = threading.Event()
+
         #vi er ikke authorized
         authorized.clear()
         awake.clear()
@@ -157,13 +211,10 @@ if __name__ == "__main__":
         bedThread.start()
         swipeThread.start()
         chatThread.start()
+
         while threading.active_count() > 1:
             features.sleep(1)
 
     except KeyboardInterrupt:
         print("\n" + bcolors.FAIL+"WHY DO YOU LEAVE ME??"+bcolors.ENDC)
         sys.exit(0)
-
-
-
-
