@@ -95,12 +95,12 @@ def SwipeLoop():
         #hvis vi ikke har flere at swipe
         if (len(ids) == 0):
             #faar vi da bare nogle flere XD
-            ids = GetIds()
+            ids = GetRecs()
         if(numberofswipes > 0 or GetWaitSeconds(timeToNextLike)< 0):
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
-                returndata = tinder_api.like(ids[len(ids)-1])
-                print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1])+bcolors.ENDC)
+                returndata = tinder_api.like(ids[len(ids)-1]['_id'])
+                print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
                 numberofswipes = int(returndata['likes_remaining'])
                 timeToNextLike = returndata.get('rate_limited_until',0)
                 print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
@@ -122,16 +122,16 @@ def UpdateMatches():
 def GetWaitSeconds(t):
     return (t-(time.time()*1000))/1000
 
-def GetIds():
+def GetRecs():
     recommendationData = tinder_api.get_recs_v2()
-    ids = findIDs(recommendationData)
+    ids = FindUsers(recommendationData)
     return ids
 
-def findIDs(data):
+def FindUsers(data):
     gizdata = data['data']['results']
     gizid = []
     for giz in gizdata:
-        gizid.append((giz['user']['_id']))
+        gizid.append((giz['user']))
 
     return gizid
 
