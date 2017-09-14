@@ -106,7 +106,7 @@ def SwipeLoop():
                 print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
-                print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]) + bcolors.ENDC)
+                print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]['name']) + bcolors.ENDC)
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
