@@ -33,6 +33,7 @@ def AuthLoop():
         #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
+        config.myTinderID = tinder_api.get_self()['_id']
         authorized.set()
         tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
         features.sleep(random.randint(1000,2000))
@@ -41,7 +42,7 @@ def SleepLoop():
 
     while(True):
         #server er 2 timer bagud
-        if int(dt.datetime.now().hour) >= 5:
+        if True:#int(dt.datetime.now().hour) >= 5:
             print(bcolors.OKBLUE + "We are awake" + bcolors.ENDC)
             awake.set()
         else:
@@ -56,6 +57,8 @@ def ChatLoop():
         #venter paa vi er authorized
         authorized.wait()
         awake.wait()
+
+
         if len(UpdateMatches()) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -74,22 +77,36 @@ def ChatLoop():
 
             allInternalMatches = dbHandler.GetAll()
             for internal in allInternalMatches:
-                users = internal['users']
                 for i in range(0,2):
+                    users = internal['users']
                     msgFromUs = GetOurMessages(users[i]['uid'])
+                    print("Msg from us %s"%msgFromUs)
                     features.sleep(1)
                     msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'])
+                    print("Msg from them %s"%msgFromThem)
                     features.sleep(1)
-                    msgToSend = GetDiffrenceArray(msgFromUs,msgFromThem)
+                    msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
+                    print("Will send %s"%msgToSend)
                     for msg in msgToSend:
                         print("Sending: %s to %s"%(msg,users[i]['uid']))
                         tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(2)
 
 
-        sleeptime = random.randint(600,1200)
+        sleeptime = random.randint(60,120)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
+
+
+def MatchIDToUID(matchID):
+    info=tinder_api.match_info(matchID)
+    if(info == None):
+        return None
+    participants = info['results']['participants']
+    for participant in participants:
+        if(participant != config.myTinderID):
+            return participant
+
 
 def SendMessages(match):
     msgarray = match['messages']
@@ -103,17 +120,20 @@ def SendMessages(match):
         print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
 
 
-def GetForeignMessages(uid):
+def GetForeignMessages(mid):
+    uid = MatchIDToUID(mid)
     matches = UpdateMatches()
     if(len(matches) == 0):
         return
     theirmsgs = []
+
     for msg in matches[uid]['messages']:
         if msg['from'] != config.myTinderID:
             theirmsgs.append(msg['message'])
     return theirmsgs
 
-def GetOurMessages(uid):
+def GetOurMessages(mid):
+    uid = MatchIDToUID(mid)
     matches = UpdateMatches()
     if(len(matches) == 0):
         return

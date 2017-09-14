@@ -48,7 +48,7 @@ def get_match_id_by_name(name):
     '''
     Returns a list_of_ids that have the same name as your input
     '''
-    global match_info
+    match_info = get_match_info()
     list_of_ids = []
     for match in match_info:
         if match_info[match]['name'] == name:
