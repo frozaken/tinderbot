@@ -28,6 +28,7 @@ class bcolors:
 def AuthLoop():
     while(True):
         awake.wait()
+
         print('Authorizing')
         #saetter authorized til false
         authorized.clear()
@@ -57,7 +58,6 @@ def ChatLoop():
         authorized.wait()
         awake.wait()
 
-
         if len(UpdateMatches()) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -75,21 +75,21 @@ def ChatLoop():
                 dbHandler.InsertPair(match[0],match[1])
 
             allInternalMatches = dbHandler.GetAll()
+            matches = UpdateMatches()
             for internal in allInternalMatches:
                 for i in range(0,2):
                     users = internal['users']
-                    msgFromUs = GetOurMessages(users[i]['uid'])
-                    print("Msg from us %s"%msgFromUs)
-                    features.sleep(1)
-                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'])
-                    print("Msg from them %s"%msgFromThem)
-                    features.sleep(1)
+
+                    msgFromUs = GetOurMessages(users[i]['uid'],matches)
+                    #print("Msg from us %s"%msgFromUs)
+                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matches)
+                    #print("Msg from them %s"%msgFromThem)
                     msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
                     print("Will send %s"%msgToSend)
                     for msg in msgToSend:
                         print("Sending: %s to %s"%(msg,users[i]['uid']))
                         tinder_api.send_msg(users[i]['uid'],msg)
-                features.sleep(2)
+                features.sleep(0.5)
 
 
         sleeptime = random.randint(60,120)
@@ -119,9 +119,9 @@ def SendMessages(match):
         print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
 
 
-def GetForeignMessages(mid):
+def GetForeignMessages(mid,matches):
     uid = MatchIDToUID(mid)
-    matches = UpdateMatches()
+
     if(len(matches) == 0):
         return
     theirmsgs = []
@@ -131,9 +131,9 @@ def GetForeignMessages(mid):
             theirmsgs.append(msg['message'])
     return theirmsgs
 
-def GetOurMessages(mid):
+def GetOurMessages(mid,matches):
     uid = MatchIDToUID(mid)
-    matches = UpdateMatches()
+
     if(len(matches) == 0):
         return
     ourmsgs = []
@@ -187,7 +187,7 @@ def SwipeLoop():
 
             print(bcolors.OKBLUE+ "Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes" + bcolors.ENDC)
             features.sleep(GetWaitSeconds(timeToNextLike))
-        features.sleep(random.randrange(60,120))
+        features.sleep(random.randrange(1,2))
 
 def UpdateMatches():
     return features.get_match_info()
