@@ -194,6 +194,14 @@ def dislike(person_id):
     except requests.exceptions.RequestException as e:
         print("Something went wrong. Could not dislike:", e)
 
+def unmatch(matchId):
+    try:
+        url = config.host + '/user/matches/%s'%(matchId)
+        r = requests.delete(url, headers=headers)
+        return r.json()
+    except requests.exceptions.RequestException as e:
+        print("Could not unmatch: %s"%e)
+
 
 def report(person_id, cause, explanation=''):
     '''

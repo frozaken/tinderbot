@@ -85,16 +85,23 @@ def ChatLoop():
                     msgFromUs = GetOurMessages(users[i]['uid'],matches)
                     #print("Msg from us %s"%msgFromUs)
                     msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matches)
-                    #print("Msg from them %s"%msgFromThem)
-                    msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
-                    for msg in msgToSend:
-                        msg = InputSanitizer(msg,users[i]['uid'],matches)
-                        print("Sending: %s to %s"%(msg,users[i]['uid']))
-                        tinder_api.send_msg(users[i]['uid'],msg)
+
+                    if(msgFromThem == "unmatch" or msgFromUs == "unmatch"):
+                        tinder_api.unmatch(users[0]['uid'])
+                        tinder_api.unmatch(users[1]['uid'])
+                        dbHandler.RemoveEntry(internal)
+                        break
+                    else:
+                        #print("Msg from them %s"%msgFromThem)
+                        msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
+                        for msg in msgToSend:
+                            msg = InputSanitizer(msg,users[i]['uid'],matches)
+                            print("Sending: %s to %s"%(msg,users[i]['uid']))
+                            tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(0.5)
 
 
-        sleeptime = random.randint(60,120)
+        sleeptime = random.randint(10,30)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
 
@@ -131,10 +138,13 @@ def GetForeignMessages(mid,matches):
     if(len(matches) == 0):
         return
     theirmsgs = []
-
-    for msg in matches[uid]['messages']:
-        if msg['from'] != config.myTinderID:
-            theirmsgs.append(msg['message'])
+    try:
+        for msg in matches[uid]['messages']:
+            if msg['from'] != config.myTinderID:
+                theirmsgs.append(msg['message'])
+    except KeyError:
+        print("Should unmatch")
+        return "unmatch"
     return theirmsgs
 
 def GetOurMessages(mid,matches):
@@ -143,9 +153,13 @@ def GetOurMessages(mid,matches):
     if(len(matches) == 0):
         return
     ourmsgs = []
-    for msg in matches[uid]['messages']:
-        if msg['from'] == config.myTinderID:
-            ourmsgs.append(msg['message'])
+    try:
+        for msg in matches[uid]['messages']:
+            if msg['from'] == config.myTinderID:
+                ourmsgs.append(msg['message'])
+    except KeyError:
+        print("Should unmatch")
+        return "unmatch"
     return ourmsgs
 
 def GetDiffrenceArray(A,B):
@@ -202,7 +216,14 @@ def GetWaitSeconds(t):
     return (t-(time.time()*1000))/1000
 
 def GetRecs():
-    recommendationData = tinder_api.get_recs_v2()
+    while(True):
+        try:
+            recommendationData = tinder_api.get_recs_v2()
+        except KeyError:
+            print("Could not get recommendation data, retrying")
+            continue
+        break
+
     ids = FindUsers(recommendationData)
     return ids
 
@@ -216,6 +237,8 @@ def FindUsers(data):
 
 if __name__ == "__main__":
     try:
+
+
         dbHandler.ConnectToDB()
         authorized = threading.Event()
         awake = threading.Event()

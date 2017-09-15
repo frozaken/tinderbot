@@ -33,6 +33,16 @@ def FindPartnerID(findid):
             if(user['uid'] != findid):
                 return user['uid']
 
+def RemoveEntry(_id):
+    global collection
+    try:
+        collection.delete_one({'_id':_id})
+        print("Sucessfully removed %s"%_id)
+    except:
+        print("Error deleting")
+
+
+
 def GetAll():
     global collection
     entries = []
