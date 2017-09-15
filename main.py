@@ -33,7 +33,9 @@ def AuthLoop():
         #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
-        config.myTinderID = tinder_api.get_self()['_id']
+        self=tinder_api.get_self()
+        config.myTinderID = self['_id']
+        config.myTinderName = self['name']
         authorized.set()
         tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
         features.sleep(random.randint(1000,2000))
@@ -86,6 +88,7 @@ def ChatLoop():
                     #print("Msg from them %s"%msgFromThem)
                     msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
                     for msg in msgToSend:
+                        msg = InputSanitizer(msg,users[i]['uid'],matches)
                         print("Sending: %s to %s"%(msg,users[i]['uid']))
                         tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(0.5)
@@ -95,6 +98,10 @@ def ChatLoop():
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
 
+
+def InputSanitizer(input, match, matches):
+    input = str(input).replace(config.myTinderName,matches[MatchIDToUID(match)]['name'])
+    return input
 
 def MatchIDToUID(matchID):
     info=tinder_api.match_info(matchID)
