@@ -109,6 +109,11 @@ def ChatLoop():
 def InputSanitizer(input, match, matches):
     input = str(input).replace(match[dbHandler.FindPartnerID(match)['name']],config.myTinderName)
     input = str(input).replace(config.myTinderName,matches[MatchIDToUID(match)]['name'])
+    bannedwords = ["facebook","face","snapchat","snapchat","ig","instagram","insta"]
+    for word in bannedwords:
+        if word in input:
+            input = input.replace(word,'')
+    input = str(input).replace()
     return input
 
 def MatchIDToUID(matchID):
