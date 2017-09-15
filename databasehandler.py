@@ -38,8 +38,8 @@ def FindPartnerID(findid):
 def RemoveEntry(_id):
     global collection
     try:
-        collection.delete_one({'_id':ObjectId(_id)})
-        print("Sucessfully removed %s"%_id)
+        collection.delete_one({'_id':_id['_id']})
+        print("Successfully deleted %s"%(_id['_id']))
     except:
         print("Error deleting")
 
