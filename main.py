@@ -85,8 +85,6 @@ def ChatLoop():
                     msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matches)
                     #print("Msg from them %s"%msgFromThem)
                     msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
-                    if(len(msgToSend) > 0):
-                        print("Will send %s"%msgToSend)
                     for msg in msgToSend:
                         print("Sending: %s to %s"%(msg,users[i]['uid']))
                         tinder_api.send_msg(users[i]['uid'],msg)
