@@ -85,31 +85,44 @@ def ChatLoop():
                     msgFromUs = GetOurMessages(users[i]['uid'],matches)
                     #print("Msg from us %s"%msgFromUs)
                     msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matches)
+                    sanitizedMsgFromUs = []
+                    sanitizedMsgFromThem = []
 
                     if(msgFromThem == "unmatch" or msgFromUs == "unmatch"):
                         tinder_api.unmatch(users[0]['uid'])
                         tinder_api.unmatch(users[1]['uid'])
                         dbHandler.RemoveEntry(internal)
                         break
+
+                    for m in msgFromUs:
+                        sanitizedMsgFromUs.append(InputSanitizer(m, users[(i+1)%2]['uid'],users[i]['uid'], matches))
+                    for m in msgFromThem:
+                        sanitizedMsgFromThem.append(InputSanitizer(m, users[i]['uid'],users[(i+1)%2]['uid'], matches))
+
                     else:
                         #print("Msg from them %s"%msgFromThem)
-                        msgToSend = GetDiffrenceArray(msgFromThem,msgFromUs)
+                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,sanitizedMsgFromUs)
                         for msg in msgToSend:
-                            msg = InputSanitizer(msg,users[i]['uid'],matches)
+                            msg = InputSanitizer(msg,users[i]['uid'],users[(i+1)%2]['uid'],matches)
                             print("Sending: %s to %s"%(msg,users[i]['uid']))
                             tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(0.5)
 
 
-        sleeptime = random.randint(10,30)
+        sleeptime = random.randint(5,15)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
 
 
-def InputSanitizer(input, match, matches):
-    input = str(input).replace(matches[MatchIDToUID(dbHandler.FindPartnerID(match))]['name'],config.myTinderName)
-    input = str(input).replace(config.myTinderName,matches[MatchIDToUID(match)]['name'])
-    bannedwords = ["facebook","face","snapchat","snapchat","ig","instagram","insta"]
+def InputSanitizer(input, match,partner, matches):
+    print("Sanitizing %s"%input)
+
+    matchName = matches[MatchIDToUID(match)]['name']
+    partnerName = matches[MatchIDToUID(partner)]['name']
+    if((config.myTinderName in input) or (partner in input)):
+        input = str(input).replace(partner,config.myTinderName)
+        input = str(input).replace(config.myTinderName,matches)
+    bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
         if word in input:
             input = input.replace(word,'')

@@ -34,6 +34,7 @@ def FindPartnerID(findid):
         for user in result['users']:
             if(user['uid'] != findid):
                 return user['uid']
+    return result
 
 def RemoveEntry(_id):
     global collection
