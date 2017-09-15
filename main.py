@@ -28,7 +28,6 @@ class bcolors:
 def AuthLoop():
     while(True):
         awake.wait()
-        #authCond.wait()
         print('Authorizing')
         #saetter authorized til false
         authorized.clear()
@@ -188,7 +187,7 @@ def SwipeLoop():
 
             print(bcolors.OKBLUE+ "Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes" + bcolors.ENDC)
             features.sleep(GetWaitSeconds(timeToNextLike))
-        features.sleep(random.randrange(1,2))
+        features.sleep(random.randrange(60,120))
 
 def UpdateMatches():
     return features.get_match_info()
