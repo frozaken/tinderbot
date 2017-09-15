@@ -6,6 +6,8 @@ import pymongo
 import json
 import urllib.parse
 from main import UpdateMatches
+from bson.objectid import ObjectId
+
 
 
 
@@ -36,7 +38,7 @@ def FindPartnerID(findid):
 def RemoveEntry(_id):
     global collection
     try:
-        collection.delete_one({'_id':_id})
+        collection.delete_one({'_id':ObjectId(_id)})
         print("Sucessfully removed %s"%_id)
     except:
         print("Error deleting")
