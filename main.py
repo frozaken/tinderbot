@@ -107,6 +107,7 @@ def ChatLoop():
 
 
 def InputSanitizer(input, match, matches):
+    input = str(input).replace(match[dbHandler.FindPartnerID(match)['name']],config.myTinderName)
     input = str(input).replace(config.myTinderName,matches[MatchIDToUID(match)]['name'])
     return input
 
