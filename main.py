@@ -12,7 +12,7 @@ import threading
 import sys;
 import datetime as dt
 import databasehandler as dbHandler
-
+import re
 
 
 class bcolors:
@@ -102,17 +102,17 @@ def ChatLoop():
                         break
 
                     for m in msgFromUs:
-                        sanitizedMsgFromUs.append(InputSanitizer(m, names[(i+1)%2],names[i]))
+                        sanitizedMsgFromUs.append(InputSanitizer(m, names[i],names[(i+1)%2]))
                     for m in msgFromThem:
-                        sanitizedMsgFromThem.append(InputSanitizer(m, names[i],names[(i+1)%2]))
+                        sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
 
                     else:
                         #print("Msg from them %s"%msgFromThem)
                         msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,sanitizedMsgFromUs)
                         for msg in msgToSend:
-                            msg = InputSanitizer(msg,names[i],names[(i+1)%2])
-                            print("Sending: %s to %s"%(msg,users[i]['uid']))
-                            tinder_api.send_msg(users[i]['uid'],msg)
+                            if(len(msg)>0):
+                                print("Sending: %s to %s"%(msg,users[i]['uid']))
+                                tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(0.5)
 
 
@@ -123,9 +123,11 @@ def ChatLoop():
 
 def InputSanitizer(input, fromName,toName):
 
+    input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
     if((config.myTinderName in input) or (fromName in input)):
         input = str(input).replace(config.myTinderName, toName)
         input = str(input).replace(fromName,config.myTinderName)
+
 
     bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
