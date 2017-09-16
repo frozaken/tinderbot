@@ -60,16 +60,18 @@ def ChatLoop():
         authorized.wait()
         awake.wait()
 
-        if len(UpdateMatches()) == 0:
+
+        matchData = UpdateMatches()
+        if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
 
-
-            unmatched = dbHandler.GetUnmatched()
+            unmatched = dbHandler.GetUnmatched(matchData)
             matches = []
             if(len(unmatched)>=2):
                 for i in range(0,(len(unmatched)//2)*2,2):
                     matches.append([unmatched[i],unmatched[i+1]])
+                    print("Cheking unmatched %s and %s"%(i,i+1))
             else:
                 print(bcolors.OKGREEN + "No new matches to be made this time" +bcolors.ENDC)
             for match in matches:
@@ -79,6 +81,11 @@ def ChatLoop():
             allInternalMatches = dbHandler.GetAll()
             matches = UpdateMatches()
             for internal in allInternalMatches:
+                ## LOG NAMES HERE FOR LESS API CALLS
+                names=[]
+                names.append(tinder_api.match_info(internal['users'][0]['uid'])['results']['person']['name'])
+                names.append(tinder_api.match_info(internal['users'][1]['uid'])['results']['person']['name'])
+
                 for i in range(0,2):
                     users = internal['users']
 
@@ -95,15 +102,15 @@ def ChatLoop():
                         break
 
                     for m in msgFromUs:
-                        sanitizedMsgFromUs.append(InputSanitizer(m, users[(i+1)%2]['uid'],users[i]['uid'], matches))
+                        sanitizedMsgFromUs.append(InputSanitizer(m, names[(i+1)%2],names[i]))
                     for m in msgFromThem:
-                        sanitizedMsgFromThem.append(InputSanitizer(m, users[i]['uid'],users[(i+1)%2]['uid'], matches))
+                        sanitizedMsgFromThem.append(InputSanitizer(m, names[i],names[(i+1)%2]))
 
                     else:
                         #print("Msg from them %s"%msgFromThem)
                         msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,sanitizedMsgFromUs)
                         for msg in msgToSend:
-                            msg = InputSanitizer(msg,users[i]['uid'],users[(i+1)%2]['uid'],matches)
+                            msg = InputSanitizer(msg,names[i],names[(i+1)%2])
                             print("Sending: %s to %s"%(msg,users[i]['uid']))
                             tinder_api.send_msg(users[i]['uid'],msg)
                 features.sleep(0.5)
@@ -114,14 +121,12 @@ def ChatLoop():
         features.sleep(sleeptime)
 
 
-def InputSanitizer(input, match,partner, matches):
-    print("Sanitizing %s"%input)
+def InputSanitizer(input, fromName,toName):
 
-    matchName = matches[MatchIDToUID(match)]['name']
-    partnerName = matches[MatchIDToUID(partner)]['name']
-    if((config.myTinderName in input) or (partner in input)):
-        input = str(input).replace(partner,config.myTinderName)
-        input = str(input).replace(config.myTinderName,matches)
+    if((config.myTinderName in input) or (fromName in input)):
+        input = str(input).replace(config.myTinderName, toName)
+        input = str(input).replace(fromName,config.myTinderName)
+
     bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
         if word in input:

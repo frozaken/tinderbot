@@ -61,8 +61,10 @@ def HasMatch(uid):
         return True
     return False
 
-def GetUnmatched():
-    data = UpdateMatches()
+def GetUnmatched(data):
+    print("Getting unmatched")
+    if(data == None):
+        data = UpdateMatches()
     unmatched = []
     for key,value in data.items():
         if(not HasMatch(value['match_id'])):
