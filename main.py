@@ -60,7 +60,6 @@ def ChatLoop():
         authorized.wait()
         awake.wait()
 
-
         matchData = UpdateMatches()
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
@@ -101,34 +100,29 @@ def ChatLoop():
                         dbHandler.RemoveEntry(internal)
                         break
 
-                    for m in msgFromUs:
-                        sanitizedMsgFromUs.append(InputSanitizer(m, names[i],names[(i+1)%2]))
                     for m in msgFromThem:
                         sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
 
                     else:
                         #print("Msg from them %s"%msgFromThem)
-                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,sanitizedMsgFromUs)
+                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
                         for msg in msgToSend:
                             if(len(msg)>0):
                                 print("Sending: %s to %s"%(msg,users[i]['uid']))
                                 tinder_api.send_msg(users[i]['uid'],msg)
-                features.sleep(0.5)
-
-
-        sleeptime = random.randint(5,15)
-        print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
-        features.sleep(sleeptime)
+        #sleeptime = random.randint(5,15)
+        #print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
+        #features.sleep(sleeptime)
 
 
 def InputSanitizer(input, fromName,toName):
 
-    input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
+
     if((config.myTinderName in input) or (fromName in input)):
         input = str(input).replace(config.myTinderName, toName)
         input = str(input).replace(fromName,config.myTinderName)
 
-
+    input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
     bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
         if word in input:
@@ -198,7 +192,7 @@ def GetDiffrenceArray(A,B):
 
 def Search(A,x):
     for a in A:
-        if a == x:
+        if a.lower() == x.lower():
             return True
     return False
 
