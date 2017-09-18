@@ -93,6 +93,8 @@ def ChatLoop():
                                 dbHandler.RemoveEntry(internal)
                                 print("Succesfully cleaned")
                                 continue
+                    else:
+                        print(bcolors.OKGREEN+"Nobody to unmatch"+bcolors.ENDC)
                 except Exception as e:
                     print(e)
                     print("Could not unmatch, got error %s" % e)
@@ -108,7 +110,7 @@ def ChatLoop():
                     exit(1)
                     return
 
-                
+
                 for i in range(0,2):
                     users = internal['users']
 
@@ -289,7 +291,7 @@ if __name__ == "__main__":
         bedThread.daemon = True
         authThread.start()
         bedThread.start()
-        swipeThread.start()
+        #swipeThread.start()
         chatThread.start()
 
         while threading.active_count() > 1:
