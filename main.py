@@ -88,20 +88,19 @@ def ChatLoop():
                     names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
                 except:
                     try:
-                        print("Unmatching %s"%str(0))
                         tinder_api.unmatch(users[0]['uid'])
-                        continue
+                        print("Unmatching %s" % str(0))
                     except:
                         print("Failure unmatching")
                         continue
                     try:
-                        print("Unmatching %s"%str(1))
                         tinder_api.unmatch(users[1]['uid'])
-                        continue
+                        print("Unmatching %s" % str(1))
                     except:
                         print("Failure unmatching")
                         continue
                     dbHandler.RemoveEntry(internal)
+                    continue
 
                 for i in range(0,2):
                     users = internal['users']
