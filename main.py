@@ -53,8 +53,6 @@ def SleepLoop():
 
         features.sleep(30*60)
 
-def CheckUnmatches():
-
 
 def ChatLoop():
 
