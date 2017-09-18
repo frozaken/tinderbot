@@ -37,7 +37,7 @@ def AuthLoop():
         config.myTinderID = self['_id']
         config.myTinderName = self['name']
         authorized.set()
-        tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=30)
+        tinder_api.change_preferences(age_filter_min=18, age_filter_max=22, distance_filter=15)
         features.sleep(random.randint(1000,2000))
 
 def SleepLoop():
@@ -88,6 +88,7 @@ def ChatLoop():
                     names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
                 except:
                     try:
+                        print("Unmatching")
                         tinder_api.unmatch(users[0]['uid'])
                         tinder_api.unmatch(users[1]['uid'])
                         continue
