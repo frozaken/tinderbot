@@ -53,6 +53,7 @@ def SleepLoop():
 
         features.sleep(30*60)
 
+def CheckUnmatches():
 
 
 def ChatLoop():
@@ -178,7 +179,6 @@ def GetForeignMessages(mid,matches):
                 theirmsgs.append(msg['message'])
     except KeyError:
         print("Should unmatch")
-        return "unmatch"
     return theirmsgs
 
 def GetOurMessages(mid,matches):
@@ -193,7 +193,6 @@ def GetOurMessages(mid,matches):
                 ourmsgs.append(msg['message'])
     except KeyError:
         print("Should unmatch")
-        return "unmatch"
     return ourmsgs
 
 def GetDiffrenceArray(A,B):
