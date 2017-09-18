@@ -26,15 +26,15 @@ def get_match_info():
             match_info[person_id] = {
                 "name": person['name'],
                 "match_id": match['id'],  # This ID for messaging
-                "message_count": match['message_count'],
-                "photos": get_photos(person),
-                "bio": person.get('bio','NO BIO'),
-                "gender": person['gender'],
-                "avg_successRate": get_avg_successRate(person),
+                #"message_count": match['message_count'],
+                #"photos": get_photos(person),
+                #"bio": person.get('bio','NO BIO'),
+                #"gender": person['gender'],
+                #"avg_successRate": get_avg_successRate(person),
                 "messages": match['messages'],
-                "age": calculate_age(match['person']['birth_date']),
-                "distance": api.get_person(person_id)['results']['distance_mi'],
-                "last_activity_date": match['last_activity_date'],
+                #"age": calculate_age(match['person']['birth_date']),
+                #"distance": api.get_person(person_id)['results']['distance_mi'],
+                #"last_activity_date": match['last_activity_date'],
             }
         except Exception as ex:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"

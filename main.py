@@ -53,6 +53,8 @@ def SleepLoop():
 
         features.sleep(30*60)
 
+
+
 def ChatLoop():
 
     while(True):
@@ -60,7 +62,7 @@ def ChatLoop():
         authorized.wait()
         awake.wait()
 
-        matchData = UpdateMatches()
+        matchData = features.get_match_info()
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -78,27 +80,31 @@ def ChatLoop():
                 dbHandler.InsertPair(match[0],match[1])
 
             allInternalMatches = dbHandler.GetAll()
-            matches = UpdateMatches()
             for internal in allInternalMatches:
                 ## LOG NAMES HERE FOR LESS API CALLS
                 names=[]
-                names.append(tinder_api.match_info(internal['users'][0]['uid'])['results']['person']['name'])
-                names.append(tinder_api.match_info(internal['users'][1]['uid'])['results']['person']['name'])
+                try:
+                    names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
+                    names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
+                except:
+                    try:
+                        tinder_api.unmatch(users[0]['uid'])
+                        tinder_api.unmatch(users[1]['uid'])
+                        continue
+                    except:
+                        print("Failure unmatching")
+                        continue
+                    dbHandler.RemoveEntry(internal)
 
                 for i in range(0,2):
                     users = internal['users']
 
-                    msgFromUs = GetOurMessages(users[i]['uid'],matches)
+                    msgFromUs = GetOurMessages(users[i]['uid'],matchData)
                     #print("Msg from us %s"%msgFromUs)
-                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matches)
-                    sanitizedMsgFromUs = []
+                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
                     sanitizedMsgFromThem = []
 
-                    if(msgFromThem == "unmatch" or msgFromUs == "unmatch"):
-                        tinder_api.unmatch(users[0]['uid'])
-                        tinder_api.unmatch(users[1]['uid'])
-                        dbHandler.RemoveEntry(internal)
-                        break
+
 
                     for m in msgFromThem:
                         sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
@@ -130,13 +136,7 @@ def InputSanitizer(input, fromName,toName):
     return input
 
 def MatchIDToUID(matchID):
-    info=tinder_api.match_info(matchID)
-    if(info == None):
-        return None
-    participants = info['results']['participants']
-    for participant in participants:
-        if(participant != config.myTinderID):
-            return participant
+    return str(matchID).replace(config.myTinderID,"")
 
 
 def SendMessages(match):
