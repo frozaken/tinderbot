@@ -116,9 +116,9 @@ def ChatLoop():
                             if(len(msg)>0):
                                 print("Sending: %s to %s"%(msg,users[i]['uid']))
                                 tinder_api.send_msg(users[i]['uid'],msg)
-        #sleeptime = random.randint(5,15)
-        #print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
-        #features.sleep(sleeptime)
+        sleeptime = random.randint(3,10)
+        print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
+        features.sleep(sleeptime)
 
 
 def InputSanitizer(input, fromName,toName):
