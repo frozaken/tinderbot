@@ -63,6 +63,7 @@ def ChatLoop():
         awake.wait()
 
         matchData = features.get_match_info()
+
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -81,27 +82,33 @@ def ChatLoop():
 
             allInternalMatches = dbHandler.GetAll()
             for internal in allInternalMatches:
+
+                #CHECK FOR UNMATCH
+                try:
+                    if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or
+                                tinder_api.match_info(internal['users'][1]['uid'])['status'] == True):
+                        print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
+                        if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
+                            if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
+                                dbHandler.RemoveEntry(internal)
+                                print("Succesfully cleaned")
+                                continue
+                except Exception as e:
+                    print(e)
+                    print("Could not unmatch, got error %s" % e)
+                    continue
+
                 ## LOG NAMES HERE FOR LESS API CALLS
                 names=[]
                 try:
                     names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
                     names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
-                except:
-                    try:
-                        tinder_api.unmatch(users[0]['uid'])
-                        print("Unmatching %s" % str(0))
-                    except:
-                        print("Failure unmatching")
-                        continue
-                    try:
-                        tinder_api.unmatch(users[1]['uid'])
-                        print("Unmatching %s" % str(1))
-                    except:
-                        print("Failure unmatching")
-                        continue
-                    dbHandler.RemoveEntry(internal)
-                    continue
+                except Exception as e:
+                    print("Error: %s"%e)
+                    exit(1)
+                    return
 
+                
                 for i in range(0,2):
                     users = internal['users']
 
