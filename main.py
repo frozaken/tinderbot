@@ -84,8 +84,7 @@ def ChatLoop():
 
                 #CHECK FOR UNMATCH
                 try:
-                    if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or
-                                tinder_api.match_info(internal['users'][1]['uid'])['status'] == True):
+                    if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or tinder_api.match_info(internal['users'][1]['uid'])['results']['closed'] == True):
                         print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
                         if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
                             if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
