@@ -291,7 +291,7 @@ if __name__ == "__main__":
         bedThread.daemon = True
         authThread.start()
         bedThread.start()
-        #swipeThread.start()
+        swipeThread.start()
         chatThread.start()
 
         while threading.active_count() > 1:
