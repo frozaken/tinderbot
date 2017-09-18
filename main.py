@@ -125,7 +125,7 @@ def InputSanitizer(input, fromName,toName):
     input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
     bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
-        if str(word).lower in str(input).lower():
+        if word in input:
             input = input.replace(word,'')
     return input
 
