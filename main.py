@@ -62,6 +62,8 @@ def ChatLoop():
 
         matchData = features.get_match_info()
 
+        #print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
+
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -151,15 +153,15 @@ def InputSanitizer(input, fromName,toName):
     for word in cutInput:
         toAdd = word
         if "dreng".lower() in str(word).lower():
-            toAdd = re.sub("pige", lambda m: replacement_func(m,"dreng"),word,flags=re.I)
+            toAdd = re.sub("dreng", lambda m: replacement_func(m,"pige"),word,flags=re.I)
         elif "pige".lower() in str(word).lower():
-            toAdd = re.sub("drenge", lambda m: replacement_func(m, "pige"), word, flags=re.I)
+            toAdd = re.sub("pige", lambda m: replacement_func(m, "dreng"), word, flags=re.I)
         elif "boy".lower() in str(word).lower():
-            toAdd = re.sub("girl", lambda m: replacement_func(m, "boy"), word, flags=re.I)
-        elif "girl".lower() in str(word).lower():
             toAdd = re.sub("boy", lambda m: replacement_func(m, "girl"), word, flags=re.I)
-        elif "guy".lower() in str(word).lower():
+        elif "girl".lower() in str(word).lower():
             toAdd = re.sub("girl", lambda m: replacement_func(m, "guy"), word, flags=re.I)
+        elif "guy".lower() in str(word).lower():
+            toAdd = re.sub("guy", lambda m: replacement_func(m, "girl"), word, flags=re.I)
 
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
@@ -167,7 +169,7 @@ def InputSanitizer(input, fromName,toName):
     bannedwords = ["facebook","face","snapchat","Snapchat","instagram","insta"]
     for word in bannedwords:
         if word in collectedInput:
-            collectedInput = collectedInput.replace(word,'')
+            collectedInput = re.sub(word, lambda m: replacement_func(m, ""), collectedInput, flags=re.I)
     return collectedInput
 
 def MatchIDToUID(matchID):
