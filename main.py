@@ -53,7 +53,6 @@ def SleepLoop():
 
         features.sleep(30*60)
 
-
 def ChatLoop():
 
     while(True):
@@ -91,8 +90,6 @@ def ChatLoop():
                                 dbHandler.RemoveEntry(internal)
                                 print("Succesfully cleaned")
                                 continue
-                    else:
-                        print(bcolors.OKGREEN+"Nobody to unmatch"+bcolors.ENDC)
                 except Exception as e:
                     print(e)
                     print("Could not unmatch, got error %s" % e)
@@ -132,7 +129,6 @@ def ChatLoop():
         sleeptime = random.randint(30,60)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
-
 
 def InputSanitizer(input, fromName,toName):
 
