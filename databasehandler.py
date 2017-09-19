@@ -7,7 +7,7 @@ import json
 import urllib.parse
 from main import UpdateMatches
 from bson.objectid import ObjectId
-
+import sys
 
 
 
@@ -18,8 +18,9 @@ def ConnectToDB():
         client = MongoClient('mongodb://%s:%s@%s' % (config.dbUser,config.dbPass,config.dbHost))
         collection = client[config.dbName][config.dbCollection]
         print("Connection to database succeeded")
-    except errors.ServerSelectionTimeoutError as err:
+    except:
         print("Database connection failed")
+        sys.exit(1)
 
 def InsertPair(first,second):
     global collection

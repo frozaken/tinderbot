@@ -62,12 +62,12 @@ def ChatLoop():
 
         matchData = features.get_match_info()
 
+
         #print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
 
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
-
             unmatched = dbHandler.GetUnmatched(matchData)
             matches = []
             if(len(unmatched)>=2):
@@ -196,8 +196,8 @@ def GetForeignMessages(mid,matches):
         for msg in matches[uid]['messages']:
             if msg['from'] != config.myTinderID:
                 theirmsgs.append(msg['message'])
-    except KeyError:
-        print("Should unmatch")
+    except:
+        sys.exit(1)
     return theirmsgs
 
 def GetOurMessages(mid,matches):
@@ -210,8 +210,8 @@ def GetOurMessages(mid,matches):
         for msg in matches[uid]['messages']:
             if msg['from'] == config.myTinderID:
                 ourmsgs.append(msg['message'])
-    except KeyError:
-        print("Should unmatch")
+    except:
+        sys.exit(0)
     return ourmsgs
 
 def GetDiffrenceArray(A,B):
