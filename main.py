@@ -62,8 +62,6 @@ def ChatLoop():
 
         matchData = features.get_match_info()
 
-
-        print(InputSanitizer("Hej pige","bob","dnd"))
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
