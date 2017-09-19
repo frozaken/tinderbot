@@ -62,6 +62,8 @@ def ChatLoop():
 
         matchData = features.get_match_info()
 
+
+        print(InputSanitizer("Hej pige","bob","dnd"))
         if len(matchData) == 0:
             print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
@@ -151,15 +153,15 @@ def InputSanitizer(input, fromName,toName):
     for word in cutInput:
         toAdd = word
         if "dreng".lower() in str(word).lower():
-            toAdd = str(word).replace("dreng","pige")
+            toAdd = re.sub("pige", lambda m: replacement_func(m,"dreng"),word,flags=re.I)
         if "pige".lower() in str(word).lower():
-            toAdd = str(word).replace("pige","dreng")
+            toAdd = re.sub("drenge", lambda m: replacement_func(m, "pige"), word, flags=re.I)
         if "boy".lower() in str(word).lower():
-            toAdd = str(word).replace("boy","girl")
+            toAdd = re.sub("girl", lambda m: replacement_func(m, "boy"), word, flags=re.I)
         if "girl".lower() in str(word).lower():
-            toAdd = str(word).replace("girl","boy")
+            toAdd = re.sub("boy", lambda m: replacement_func(m, "girl"), word, flags=re.I)
         if "guy".lower() in str(word).lower():
-            toAdd = str(word).replace("guy","girl")
+            toAdd = re.sub("girl", lambda m: replacement_func(m, "guy"), word, flags=re.I)
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
 
