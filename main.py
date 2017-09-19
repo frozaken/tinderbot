@@ -53,6 +53,31 @@ def SleepLoop():
 
         features.sleep(30*60)
 
+def MatchLoop():
+    authorized.wait()
+    awake.wait()
+    ####FRA TINDER####
+    matchData = features.get_match_info()
+
+    # print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
+    print("Checking for new matches")
+    if len(matchData) == 0:
+        print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
+    else:
+        ####FRA EGEN####
+        unmatched = dbHandler.GetUnmatched(matchData)
+        matches = []
+        if (len(unmatched) >= 2):
+            for i in range(0, (len(unmatched) // 2) * 2, 2):
+                matches.append([unmatched[i], unmatched[i + 1]])
+                print("Cheking unmatched %s and %s" % (i, i + 1))
+        else:
+            print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
+        dbHandler.InsertBulk(matches)
+    sleeptime = random.randint(120, 180)
+    print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+    features.sleep(sleeptime)
+
 def ChatLoop():
 
     while(True):
@@ -62,72 +87,54 @@ def ChatLoop():
 
         matchData = features.get_match_info()
 
+        ####FROM OUR DATABASE
+        allInternalMatches = dbHandler.GetAll()
+        for internal in allInternalMatches:
 
-        #print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
+            #CHECK FOR UNMATCH
+            try:
+                if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or tinder_api.match_info(internal['users'][1]['uid'])['results']['closed'] == True):
+                    print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
+                    if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
+                        if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
+                            dbHandler.RemoveEntry(internal)
+                            print("Succesfully cleaned")
+                            continue
+            except Exception as e:
+                print(e)
+                print("Could not unmatch, got error %s" % e)
+                continue
 
-        if len(matchData) == 0:
-            print(bcolors.OKBLUE+ "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
-        else:
-            unmatched = dbHandler.GetUnmatched(matchData)
-            matches = []
-            if(len(unmatched)>=2):
-                for i in range(0,(len(unmatched)//2)*2,2):
-                    matches.append([unmatched[i],unmatched[i+1]])
-                    print("Cheking unmatched %s and %s"%(i,i+1))
-            else:
-                print(bcolors.OKGREEN + "No new matches to be made this time" +bcolors.ENDC)
-            for match in matches:
-                print("Its a match!")
-                dbHandler.InsertPair(match[0],match[1])
+            names=[]
+            try:
+                names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
+                names.append(matchData[MatchIDToUID(internal['users'][1]['uid'])]['name'])
+            except Exception as e:
+                print("Error: %s"%e)
+                kill.set()
+                return
 
-            allInternalMatches = dbHandler.GetAll()
-            for internal in allInternalMatches:
+            ##GOT USER, NOW CHECKING MESSAGES
+            for i in range(0,2):
+                users = internal['users']
 
-                #CHECK FOR UNMATCH
-                try:
-                    if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or tinder_api.match_info(internal['users'][1]['uid'])['results']['closed'] == True):
-                        print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
-                        if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
-                            if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
-                                dbHandler.RemoveEntry(internal)
-                                print("Succesfully cleaned")
-                                continue
-                except Exception as e:
-                    print(e)
-                    print("Could not unmatch, got error %s" % e)
-                    continue
-
-                ## LOG NAMES HERE FOR LESS API CALLS
-                names=[]
-                try:
-                    names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
-                    names.append(matchData[MatchIDToUID(internal['users'][1]['uid'])]['name'])
-                except Exception as e:
-                    print("Error: %s"%e)
-                    exit(1)
-                    return
-
-
-                for i in range(0,2):
-                    users = internal['users']
-
-                    msgFromUs = GetOurMessages(users[i]['uid'],matchData)
-                    #print("Msg from us %s"%msgFromUs)
-                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
-                    sanitizedMsgFromThem = []
+                msgFromUs = GetOurMessages(users[i]['uid'],matchData)
+                #print("Msg from us %s"%msgFromUs)
+                msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
+                sanitizedMsgFromThem = []
 
 
 
-                    for m in msgFromThem:
-                        sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
+                for m in msgFromThem:
+                    sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
 
-                    else:
-                        #print("Msg from them %s"%msgFromThem)
-                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
-                        for msg in msgToSend:
-                            if(len(msg)>0):
-                                print("Sending: %s to %s"%(msg,users[i]['uid']))
-                                tinder_api.send_msg(users[i]['uid'],msg)
+                else:
+                    #print("Msg from them %s"%msgFromThem)
+                    msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
+                    for msg in msgToSend:
+                        if(len(msg)>0):
+                            print("Sending: %s to %s"%(msg,users[i]['uid']))
+                            tinder_api.send_msg(users[i]['uid'],msg)
         sleeptime = random.randint(1,10)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
@@ -166,7 +173,7 @@ def InputSanitizer(input, fromName,toName):
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
 
-    bannedwords = ["facebook","face","snapchat","Snapchat","instagram","insta"]
+    bannedwords = ["facebook","face","snapchat","snap","instagram","insta"]
     for word in bannedwords:
         if word in collectedInput:
             collectedInput = re.sub(word, lambda m: replacement_func(m, ""), collectedInput, flags=re.I)
@@ -286,17 +293,18 @@ def FindUsers(data):
     return gizid
 
 if __name__ == "__main__":
+    if (not dbHandler.ConnectToDB()):
+        exit(1)
     try:
-
-
-        dbHandler.ConnectToDB()
         authorized = threading.Event()
         awake = threading.Event()
 
+        kill = threading.Event()
 
         #vi er ikke authorized
         authorized.clear()
         awake.clear()
+        kill.clear()
         #vores threads
         authThread = Thread(target = AuthLoop)
         authThread.daemon = True
@@ -306,12 +314,14 @@ if __name__ == "__main__":
         chatThread.daemon = True
         bedThread = Thread(target=SleepLoop)
         bedThread.daemon = True
+        matchThread = Thread(target=MatchLoop)
+        matchThread.daemon = True
         authThread.start()
         bedThread.start()
         swipeThread.start()
         chatThread.start()
-
-        while threading.active_count() > 1:
+        matchThread.start()
+        while not kill.wait():
             features.sleep(1)
 
     except KeyboardInterrupt:

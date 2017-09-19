@@ -8,25 +8,48 @@ import urllib.parse
 from main import UpdateMatches
 from bson.objectid import ObjectId
 import sys
+import threading
 
 
 
 def ConnectToDB():
     global collection
-    try:
-        print("Connecting to " + 'mongodb://%s:%s@%s' % (config.dbUser,config.dbPass,config.dbHost))
-        client = MongoClient('mongodb://%s:%s@%s' % (config.dbUser,config.dbPass,config.dbHost))
-        collection = client[config.dbName][config.dbCollection]
-        print("Connection to database succeeded")
-    except:
-        print("Database connection failed")
-        sys.exit(1)
+    print("Connecting to " + 'mongodb://%s:%s@%s' % ("127.0.0.1", config.dbPass, config.dbHost))
 
-def InsertPair(first,second):
+    client = MongoClient("127.0.0.1", 27017)
+    try:
+        if client[config.dbName].authenticate(config.dbUser,config.dbPass):
+            collection = client[config.dbName][config.dbCollection]
+            print("Connection to database succeeded")
+            return True
+    except pymongo.errors.OperationFailure as e:
+        print("Check credits %s"%e)
+        return False
+    except pymongo.errors.ServerSelectionTimeoutError as e:
+        print("Could not connect through localhost, using config...")
+        client = MongoClient(config.dbHost, 27017)
+        try:
+            if client[config.dbName].authenticate(config.dbUser, config.dbPass):
+                collection = client[config.dbName][config.dbCollection]
+                print("Connection to database succeeded")
+                return True
+        except pymongo.errors.OperationFailure as e:
+            print("Check credits %s" % e)
+            return False
+        except pymongo.errors.ServerSelectionTimeoutError as e:
+            print("Could not connect through config either, check your settings: %s"%e)
+            return False
+
+
+def InsertBulk(bulk):
     global collection
-    insertionObj = {'users':[{'uid':first},{'uid':second}]}
-    collection.insert_one(insertionObj)
-    print("Inserted %s"%(insertionObj))
+    if(len(bulk) == 0):
+        return
+    toInsert = []
+    for obj in bulk:
+        toInsert.append({'users':[{'uid':obj[0]},{'uid':obj[1]}]})
+    collection.insert_many(toInsert)
+    print("Inserted %s pair(s)!"%str(len(toInsert)))
 
 def FindPartnerID(findid):
     global collection
