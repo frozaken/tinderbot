@@ -154,14 +154,15 @@ def InputSanitizer(input, fromName,toName):
         toAdd = word
         if "dreng".lower() in str(word).lower():
             toAdd = re.sub("pige", lambda m: replacement_func(m,"dreng"),word,flags=re.I)
-        if "pige".lower() in str(word).lower():
+        elif "pige".lower() in str(word).lower():
             toAdd = re.sub("drenge", lambda m: replacement_func(m, "pige"), word, flags=re.I)
-        if "boy".lower() in str(word).lower():
+        elif "boy".lower() in str(word).lower():
             toAdd = re.sub("girl", lambda m: replacement_func(m, "boy"), word, flags=re.I)
-        if "girl".lower() in str(word).lower():
+        elif "girl".lower() in str(word).lower():
             toAdd = re.sub("boy", lambda m: replacement_func(m, "girl"), word, flags=re.I)
-        if "guy".lower() in str(word).lower():
+        elif "guy".lower() in str(word).lower():
             toAdd = re.sub("girl", lambda m: replacement_func(m, "guy"), word, flags=re.I)
+
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
 
