@@ -142,15 +142,34 @@ def InputSanitizer(input, fromName,toName):
         input = str(input).replace(fromName,config.myTinderName)
 
     input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
+
+    cutInput = str(input).split(" ")
+    collectedInput = ""
+    for word in cutInput:
+        toAdd = word
+        if str(word).lower() == "dreng".lower():
+            toAdd = "pige"
+        if str(word).lower() == "pige".lower():
+            toAdd = "dreng"
+        if str(word).lower() == "boy".lower():
+            toAdd = "girl"
+        if str(word).lower() == "girl".lower():
+            toAdd = "boy"
+        if str(word).lower() == "guy".lower():
+            toAdd = "girl"
+        if str(word).lower() == "girl".lower():
+            toAdd = "guy"
+        collectedInput +=toAdd+" "
+    collectedInput = collectedInput[:-1]
+
     bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
     for word in bannedwords:
-        if word in input:
-            input = input.replace(word,'')
-    return input
+        if word in collectedInput:
+            collectedInput = collectedInput.replace(word,'')
+    return collectedInput
 
 def MatchIDToUID(matchID):
     return str(matchID).replace(config.myTinderID,"")
-
 
 def SendMessages(match):
     msgarray = match['messages']
@@ -162,7 +181,6 @@ def SendMessages(match):
         print(bcolors.OKGREEN+"I should respond to "+ match['name']+ " who sent me: " + str(msgarray[len(msgarray)-1]['message']+bcolors.ENDC))
     else:
         print(bcolors.FAIL+"Waiting for "+match['name']+" to respond.."+bcolors.ENDC)
-
 
 def GetForeignMessages(mid,matches):
     uid = MatchIDToUID(mid)
@@ -198,8 +216,6 @@ def GetDiffrenceArray(A,B):
         if(not Search(B,a)):
             diff.append(a)
     return diff
-
-
 
 def Search(A,x):
     for a in A:
@@ -272,6 +288,7 @@ if __name__ == "__main__":
         dbHandler.ConnectToDB()
         authorized = threading.Event()
         awake = threading.Event()
+
 
         #vi er ikke authorized
         authorized.clear()
