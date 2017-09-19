@@ -143,18 +143,16 @@ def InputSanitizer(input, fromName,toName):
     collectedInput = ""
     for word in cutInput:
         toAdd = word
-        if str(word).lower() == "dreng".lower():
-            toAdd = "pige"
-        if str(word).lower() == "pige".lower():
-            toAdd = "dreng"
-        if str(word).lower() == "boy".lower():
-            toAdd = "girl"
-        if str(word).lower() == "girl".lower():
-            toAdd = "boy"
-        if str(word).lower() == "guy".lower():
-            toAdd = "girl"
-        if str(word).lower() == "girl".lower():
-            toAdd = "guy"
+        if "dreng".lower() in str(word).lower():
+            toAdd = str(word).replace("dreng","pige")
+        if "pige".lower() in str(word).lower():
+            toAdd = str(word).replace("pige","dreng")
+        if "boy".lower() in str(word).lower():
+            toAdd = str(word).replace("boy","girl")
+        if "girl".lower() in str(word).lower():
+            toAdd = str(word).replace("girl","boy")
+        if "guy".lower() in str(word).lower():
+            toAdd = str(word).replace("guy","girl")
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
 
