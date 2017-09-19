@@ -99,7 +99,7 @@ def ChatLoop():
                 names=[]
                 try:
                     names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
-                    names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
+                    names.append(matchData[MatchIDToUID(internal['users'][1]['uid'])]['name'])
                 except Exception as e:
                     print("Error: %s"%e)
                     exit(1)
