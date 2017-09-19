@@ -130,12 +130,19 @@ def ChatLoop():
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
 
+def replacement_func(match, repl_pattern):
+    match_str = match.group(0)
+    repl = ''.join([r_char if m_char.islower() else r_char.upper()
+                   for r_char, m_char in zip(repl_pattern, match_str)])
+    repl += repl_pattern[len(match_str):]
+    return repl
+
 def InputSanitizer(input, fromName,toName):
 
 
     if((config.myTinderName.lower() in input.lower()) or (fromName.lower() in input.lower())):
-        input = str(input).replace(config.myTinderName, toName)
-        input = str(input).replace(fromName,config.myTinderName)
+        input = re.sub(config.myTinderName, lambda m: replacement_func(m,toName),input,flags=re.I)
+        input = re.sub(fromName, lambda m: replacement_func(m, config.myTinderName), input, flags=re.I)
 
     input = re.sub(r'^https?:\/\/.*[\r\n]*', '', input, flags=re.MULTILINE)
 
@@ -156,7 +163,7 @@ def InputSanitizer(input, fromName,toName):
         collectedInput +=toAdd+" "
     collectedInput = collectedInput[:-1]
 
-    bannedwords = ["facebook","face","snapchat","snapchat","instagram","insta"]
+    bannedwords = ["facebook","face","snapchat","Snapchat","instagram","insta"]
     for word in bannedwords:
         if word in collectedInput:
             collectedInput = collectedInput.replace(word,'')
