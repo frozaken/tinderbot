@@ -133,7 +133,7 @@ def ChatLoop():
 def InputSanitizer(input, fromName,toName):
 
 
-    if((config.myTinderName in input) or (fromName in input)):
+    if((config.myTinderName.lower() in input.lower()) or (fromName.lower() in input.lower())):
         input = str(input).replace(config.myTinderName, toName)
         input = str(input).replace(fromName,config.myTinderName)
 
