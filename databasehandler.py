@@ -14,7 +14,7 @@ import threading
 
 def ConnectToDB():
     global collection
-    print("Connecting to " + 'mongodb://%s:%s@%s' % ("127.0.0.1", config.dbPass, config.dbHost))
+    print("Connecting to %s"%("127.0.0.1"))
 
     client = MongoClient("127.0.0.1", 27017)
     try:
