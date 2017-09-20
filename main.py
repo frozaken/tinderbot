@@ -54,29 +54,30 @@ def SleepLoop():
         features.sleep(30*60)
 
 def MatchLoop():
-    authorized.wait()
-    awake.wait()
-    ####FRA TINDER####
-    matchData = features.get_match_info()
+    while True:
+        authorized.wait()
+        awake.wait()
+        ####FRA TINDER####
+        matchData = features.get_match_info()
 
-    # print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
-    print("Checking for new matches")
-    if len(matchData) == 0:
-        print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
-    else:
-        ####FRA EGEN####
-        unmatched = dbHandler.GetUnmatched(matchData)
-        matches = []
-        if (len(unmatched) >= 2):
-            for i in range(0, (len(unmatched) // 2) * 2, 2):
-                matches.append([unmatched[i], unmatched[i + 1]])
-                print("Cheking unmatched %s and %s" % (i, i + 1))
+        # print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
+        print("Checking for new matches")
+        if len(matchData) == 0:
+            print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
-            print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
-        dbHandler.InsertBulk(matches)
-    sleeptime = random.randint(120, 180)
-    print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
-    features.sleep(sleeptime)
+            ####FRA EGEN####
+            unmatched = dbHandler.GetUnmatched(matchData)
+            matches = []
+            if (len(unmatched) >= 2):
+                for i in range(0, (len(unmatched) // 2) * 2, 2):
+                    matches.append([unmatched[i], unmatched[i + 1]])
+                    print("Cheking unmatched %s and %s" % (i, i + 1))
+            else:
+                print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
+            dbHandler.InsertBulk(matches)
+        sleeptime = random.randint(120, 180)
+        print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+        features.sleep(sleeptime)
 
 def ChatLoop():
 
