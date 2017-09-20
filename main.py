@@ -248,7 +248,7 @@ def SwipeLoop():
         if (len(ids) == 0):
             #faar vi da bare nogle flere XD
             ids = GetRecs()
-        if(numberofswipes > 0 or GetWaitSeconds(timeToNextLike)< 0):
+        else:
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1]['_id'])
@@ -262,11 +262,10 @@ def SwipeLoop():
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
-
-            print(bcolors.OKBLUE+ "Taking a break for " + str(int(GetWaitSeconds(timeToNextLike))//3600)+" hours and " + str(int((int((GetWaitSeconds(timeToNextLike))))/60%60))+ " minutes" + bcolors.ENDC)
-            features.sleep(GetWaitSeconds(timeToNextLike))
-        features.sleep(random.randrange(1,2))
-
+            sleeptime = random.randint(600, 1200)
+            print(bcolors.OKBLUE + "Swiping in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+            features.sleep(sleeptime)
+        features.sleep(1)
 def UpdateMatches():
     return features.get_match_info()
 
