@@ -253,8 +253,12 @@ def SwipeLoop():
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1]['_id'])
                 print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
-                numberofswipes = int(returndata['likes_remaining'])
-                timeToNextLike = returndata.get('rate_limited_until',0)
+                if('likes_remaining' in returndata):
+                    numberofswipes = int(returndata['likes_remaining'])
+                    timeToNextLike = returndata.get('rate_limited_until',0)
+                else:
+                    numberofswipes = 0
+                    print(bcolors.FAIL+"Set swipes to zero"+bcolors.ENDC)
                 print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
