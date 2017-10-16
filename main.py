@@ -102,9 +102,8 @@ def ChatLoop():
                             print("Succesfully cleaned")
                             continue
             except Exception as e:
-                print(e)
+                print("cleaning database")
                 dbHandler.RemoveEntry(internal)
-                print("Could not unmatch, got error %s" % e)
                 continue
 
             names=[]
