@@ -103,6 +103,7 @@ def ChatLoop():
                             continue
             except Exception as e:
                 print(e)
+                dbHandler.RemoveEntry(internal)
                 print("Could not unmatch, got error %s" % e)
                 continue
 
