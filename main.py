@@ -63,8 +63,7 @@ def MatchLoop():
         # print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
         #print("Checking for new matches")
         if len(matchData) == 0:
-            #print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
-            a = 2
+            print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
         else:
             ####FRA EGEN####
             unmatched = dbHandler.GetUnmatched(matchData)
@@ -74,11 +73,10 @@ def MatchLoop():
                     matches.append([unmatched[i], unmatched[i + 1]])
                     #print("Cheking unmatched %s and %s" % (i, i + 1))
             else:
-                #print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
-                a=2
+                print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
             dbHandler.InsertBulk(matches)
         sleeptime = random.randint(120, 180)
-        #print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+        print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
         features.sleep(sleeptime)
 
 def ChatLoop():
@@ -90,15 +88,14 @@ def ChatLoop():
         awake.wait()
 
         matchData = features.get_match_info()
-
         ####FROM OUR DATABASE
         allInternalMatches = dbHandler.GetAll()
         for internal in allInternalMatches:
-
+            matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
+            matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
             #CHECK FOR UNMATCH
             try:
-                matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
-                matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
+
                 #print(str(matchinfo1['status']) +"," +str(matchinfo2['status']))
                 if(matchinfo1['status'] != 200 or matchinfo2['status'] != 200):
                     if(matchinfo1['status'] == '404' or matchinfo2['status'] == '404'):
@@ -118,11 +115,11 @@ def ChatLoop():
 
             names=[]
             try:
-                names.append(matchData[MatchIDToUID(internal['users'][0]['uid'])]['name'])
-                names.append(matchData[MatchIDToUID(internal['users'][1]['uid'])]['name'])
+                names.append(matchinfo1['results']['person']['name'])
+                names.append(matchinfo2['results']['person']['name'])
             except Exception as e:
-                print("Error: %s"%e)
                 kill.set()
+                print("Nameexception: %s"%e)
                 return
 
             ##GOT USER, NOW CHECKING MESSAGES
@@ -262,7 +259,7 @@ def SwipeLoop():
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1]['_id'])
-                #print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
+                print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
                 if('likes_remaining' in returndata):
                     numberofswipes = int(returndata['likes_remaining'])
                     timeToNextLike = returndata.get('rate_limited_until',0)
@@ -277,7 +274,7 @@ def SwipeLoop():
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
             sleeptime = random.randint(600, 1200)
-            #print(bcolors.OKBLUE + "Swiping in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+            print(bcolors.OKBLUE + "Swiping in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
             features.sleep(sleeptime)
         features.sleep(1)
 
