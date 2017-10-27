@@ -61,9 +61,10 @@ def MatchLoop():
         matchData = features.get_match_info()
 
         # print(InputSanitizer("Hej LoUiSe, Må jeg få din snapChat, bOy?","Marcus","Ole"))
-        print("Checking for new matches")
+        #print("Checking for new matches")
         if len(matchData) == 0:
-            print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
+            #print(bcolors.OKBLUE + "Chat loop is waiting for matches... we currently have none :(" + bcolors.ENDC)
+            a = 2
         else:
             ####FRA EGEN####
             unmatched = dbHandler.GetUnmatched(matchData)
@@ -71,9 +72,10 @@ def MatchLoop():
             if (len(unmatched) >= 2):
                 for i in range(0, (len(unmatched) // 2) * 2, 2):
                     matches.append([unmatched[i], unmatched[i + 1]])
-                    print("Cheking unmatched %s and %s" % (i, i + 1))
+                    #print("Cheking unmatched %s and %s" % (i, i + 1))
             else:
-                print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
+                #print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
+                a=2
             dbHandler.InsertBulk(matches)
         sleeptime = random.randint(120, 180)
         #print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
@@ -83,6 +85,7 @@ def ChatLoop():
 
     while(True):
         #venter paa vi er authorized
+        print("chat loop")
         authorized.wait()
         awake.wait()
 
