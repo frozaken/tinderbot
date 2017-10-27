@@ -90,7 +90,10 @@ def ChatLoop():
         matchData = features.get_match_info()
         ####FROM OUR DATABASE
         allInternalMatches = dbHandler.GetAll()
-        for internal in allInternalMatches:
+        for k  in range(0,len(allInternalMatches)):
+            internal = allInternalMatches[k]
+            if(k%10==0):
+                print("Chat loop has checked %f percent of matches"%(k*100/(len(allInternalMatches)-1)))
             matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
             matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
             #CHECK FOR UNMATCH
