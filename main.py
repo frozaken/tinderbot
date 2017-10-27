@@ -124,28 +124,30 @@ def ChatLoop():
                 kill.set()
                 print("Nameexception: %s"%e)
                 return
+            try:
+                ##GOT USER, NOW CHECKING MESSAGES
+                for i in range(0,2):
+                    users = internal['users']
 
-            ##GOT USER, NOW CHECKING MESSAGES
-            for i in range(0,2):
-                users = internal['users']
-
-                msgFromUs = GetOurMessages(users[i]['uid'],matchData)
-                #print("Msg from us %s"%msgFromUs)
-                msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
-                sanitizedMsgFromThem = []
+                    msgFromUs = GetOurMessages(users[i]['uid'],matchData)
+                    #print("Msg from us %s"%msgFromUs)
+                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
+                    sanitizedMsgFromThem = []
 
 
 
-                for m in msgFromThem:
-                    sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
+                    for m in msgFromThem:
+                        sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
 
-                else:
-                    #print("Msg from them %s"%msgFromThem)
-                    msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
-                    for msg in msgToSend:
-                        if(len(msg)>0):
-                            print("Sending: %s to %s"%(msg,users[i]['uid']))
-                            tinder_api.send_msg(users[i]['uid'],msg)
+                    else:
+                        #print("Msg from them %s"%msgFromThem)
+                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
+                        for msg in msgToSend:
+                            if(len(msg)>0):
+                                print("Sending: %s to %s"%(msg,users[i]['uid']))
+                                tinder_api.send_msg(users[i]['uid'],msg)
+            except Exception as e:
+                print(e)
         sleeptime = random.randint(1,10)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
