@@ -56,7 +56,6 @@ def SleepLoop():
 def MatchLoop():
     while True:
         authorized.wait()
-        awake.wait()
         ####FRA TINDER####
         matchData = features.get_match_info()
 
@@ -85,12 +84,12 @@ def ChatLoop():
         #venter paa vi er authorized
         print("chat loop")
         authorized.wait()
-        awake.wait()
 
         matchData = features.get_match_info()
         ####FROM OUR DATABASE
         allInternalMatches = dbHandler.GetAll()
         for k  in range(0,len(allInternalMatches)):
+            print(str(k)+" out of "+str(len(allInternalMatches))+ " matches being checked")
             internal = allInternalMatches[k]
             if(k%10==0):
                 print("Chat loop has checked %f percent of matches"%(k*100/(len(allInternalMatches)-1)))
@@ -120,34 +119,41 @@ def ChatLoop():
             try:
                 names.append(matchinfo1['results']['person']['name'])
                 names.append(matchinfo2['results']['person']['name'])
+                #print(matchinfo1['results']['person']['name'])
             except Exception as e:
-                kill.set()
                 print("Nameexception: %s"%e)
+                kill.set()
                 return
-            try:
                 ##GOT USER, NOW CHECKING MESSAGES
-                for i in range(0,2):
-                    users = internal['users']
+            messages = [matchinfo1['results']['messages'],matchinfo2['results']['messages']]
+            for i in range(0,2):
+                users = internal['users']
+                msgFromUs = GetOurMessages(users[i]['uid'],matchData)
+                #print("Msg from us %s"%msgFromUs)
+                msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
 
-                    msgFromUs = GetOurMessages(users[i]['uid'],matchData)
-                    #print("Msg from us %s"%msgFromUs)
-                    msgFromThem = GetForeignMessages(users[(i+1)%2]['uid'],matchData)
-                    sanitizedMsgFromThem = []
+                if(msgFromUs == None or msgFromThem == None):
+                    unRes1 = tinder_api.unmatch(users[0]['uid'])
+                    unRes2 = tinder_api.unmatch(users[1]['uid'])
+                    print("ur1:%s, ur2:%s" % (unRes1, unRes2))
+                    if (unRes1['status'] == 200 and unRes2['status'] == 200):
+                        print("unmatch sucessful, removing db entry")
+                        dbHandler.RemoveEntry(internal)
+                    continue
+
+                sanitizedMsgFromThem = []
 
 
+                for m in msgFromThem:
+                    sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
 
-                    for m in msgFromThem:
-                        sanitizedMsgFromThem.append(InputSanitizer(m, names[(i+1)%2],names[i]))
-
-                    else:
-                        #print("Msg from them %s"%msgFromThem)
-                        msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
-                        for msg in msgToSend:
-                            if(len(msg)>0):
-                                print("Sending: %s to %s"%(msg,users[i]['uid']))
-                                tinder_api.send_msg(users[i]['uid'],msg)
-            except Exception as e:
-                print(e)
+                else:
+                    #print("Msg from them %s"%msgFromThem)
+                    msgToSend = GetDiffrenceArray(sanitizedMsgFromThem,msgFromUs)
+                    for msg in msgToSend:
+                        if(len(msg)>0):
+                            print("Sending: %s to %s"%(msg,users[i]['uid']))
+                            tinder_api.send_msg(users[i]['uid'],msg)
         sleeptime = random.randint(1,10)
         print(bcolors.OKBLUE+ "Checking messages in "+(str(int(sleeptime//60)))+" minutes and "+str(int(sleeptime%60))+ " seconds.."+bcolors.ENDC)
         features.sleep(sleeptime)
@@ -217,7 +223,8 @@ def GetForeignMessages(mid,matches):
             if msg['from'] != config.myTinderID:
                 theirmsgs.append(msg['message'])
     except:
-        sys.exit(1)
+        print("error getting our messages")
+        return None
     return theirmsgs
 
 def GetOurMessages(mid,matches):
@@ -231,7 +238,8 @@ def GetOurMessages(mid,matches):
             if msg['from'] == config.myTinderID:
                 ourmsgs.append(msg['message'])
     except:
-        sys.exit(0)
+        print("error getting our messages")
+        return None
     return ourmsgs
 
 def GetDiffrenceArray(A,B):
