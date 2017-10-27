@@ -29,7 +29,7 @@ def AuthLoop():
     while(True):
         awake.wait()
 
-        print('Authorizing')
+        #print('Authorizing')
         #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
@@ -45,10 +45,10 @@ def SleepLoop():
     while(True):
         #server er 2 timer bagud
         if True:#int(dt.datetime.now().hour) >= 5:
-            print(bcolors.OKBLUE + "We are awake" + bcolors.ENDC)
+            #print(bcolors.OKBLUE + "We are awake" + bcolors.ENDC)
             awake.set()
         else:
-            print(bcolors.FAIL + "Sleeping ZzZZz, waking up at 7!" + bcolors.ENDC)
+            #print(bcolors.FAIL + "Sleeping ZzZZz, waking up at 7!" + bcolors.ENDC)
             awake.clear()
 
         features.sleep(30*60)
@@ -76,7 +76,7 @@ def MatchLoop():
                 print(bcolors.OKGREEN + "No new matches to be made this time" + bcolors.ENDC)
             dbHandler.InsertBulk(matches)
         sleeptime = random.randint(120, 180)
-        print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+        #print(bcolors.OKBLUE + "Checking Matches in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
         features.sleep(sleeptime)
 
 def ChatLoop():
@@ -94,15 +94,22 @@ def ChatLoop():
 
             #CHECK FOR UNMATCH
             try:
-                if (tinder_api.match_info(internal['users'][0]['uid'])['results']['closed'] == True or tinder_api.match_info(internal['users'][1]['uid'])['results']['closed'] == True):
+                matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
+                matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
+                if(matchinfo1['status'] != 200 or matchinfo2['status'] != 200):
+                    raise Exception("got timed out")
+
+                if (matchinfo1['results']['closed'] == True or matchinfo2['results']['closed'] == True):
                     print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
                     if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
                         if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
                             dbHandler.RemoveEntry(internal)
                             print("Succesfully cleaned")
                             continue
+
+
             except Exception as e:
-                print("Error unmatching")
+                print("Error unmatching, %s"%e)
                 continue
 
             names=[]
@@ -251,24 +258,25 @@ def SwipeLoop():
             if(random.randint(0,15)>2):
                 #gaar igennem arrayet bagfra
                 returndata = tinder_api.like(ids[len(ids)-1]['_id'])
-                print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
+                #print(bcolors.OKBLUE + "Liked " + str(ids[len(ids) - 1]['name'])+bcolors.ENDC)
                 if('likes_remaining' in returndata):
                     numberofswipes = int(returndata['likes_remaining'])
                     timeToNextLike = returndata.get('rate_limited_until',0)
                 else:
                     numberofswipes = 0
-                    print(bcolors.FAIL+"Set swipes to zero"+bcolors.ENDC)
-                print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
+                    #print(bcolors.FAIL+"Set swipes to zero"+bcolors.ENDC)
+                #print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
-                print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]['name']) + bcolors.ENDC)
+                #print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]['name']) + bcolors.ENDC)
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):
             sleeptime = random.randint(600, 1200)
-            print(bcolors.OKBLUE + "Swiping in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
+            #print(bcolors.OKBLUE + "Swiping in " + (str(int(sleeptime // 60))) + " minutes and " + str(int(sleeptime % 60)) + " seconds.." + bcolors.ENDC)
             features.sleep(sleeptime)
         features.sleep(1)
+
 def UpdateMatches():
     return features.get_match_info()
 
