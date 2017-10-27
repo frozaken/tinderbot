@@ -97,6 +97,7 @@ def ChatLoop():
                 matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
                 matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
                 if(matchinfo1['status'] != 200 or matchinfo2['status'] != 200):
+                    features.sleep(1)
                     raise Exception("got timed out")
 
                 if (matchinfo1['results']['closed'] == True or matchinfo2['results']['closed'] == True):
