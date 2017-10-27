@@ -29,7 +29,7 @@ def AuthLoop():
     while(True):
         awake.wait()
 
-        #print('Authorizing')
+        print('Authorizing')
         #saetter authorized til false
         authorized.clear()
         tinder_api.get_auth_token(config.fb_access_token, config.fb_user_id)
@@ -99,25 +99,19 @@ def ChatLoop():
             try:
                 matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
                 matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
+                #print(str(matchinfo1['status']) +"," +str(matchinfo2['status']))
                 if(matchinfo1['status'] != 200 or matchinfo2['status'] != 200):
-                    if(matchinfo1['status'] == '404'):
-                        raise Exception(str(internal['users'][1]['uid']))
-                    if(matchinfo2['status'] == '404'):
-                        raise Exception(str(internal['users'][0]['uid']))
+                    if(matchinfo1['status'] == '404' or matchinfo2['status'] == '404'):
 
-                if (matchinfo1['results']['closed'] == True or matchinfo2['results']['closed'] == True):
-                    print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
-                    if (tinder_api.unmatch(internal['users'][0]['uid'])['status'] == 200):
-                        if (tinder_api.unmatch(internal['users'][1]['uid'])['status'] == 200):
-                            dbHandler.RemoveEntry(internal)
-                            print("Succesfully cleaned")
-                            continue
-
+                        raise Exception(str(internal['users'][0]['uid'])+","+str(internal['users'][1]['uid']))
 
             except Exception as e:
                 print("Error unmatching, %s, retrying"%e)
-                unRes = tinder_api.unmatch(e)
-                if(unRes['status']==200):
+                ids = str(e).split(',')
+                unRes1 = tinder_api.unmatch(ids[0])
+                unRes2 = tinder_api.unmatch(ids[1])
+                print("ur1:%s, ur2:%s"%(unRes1,unRes2))
+                if(unRes1['status']==200 and unRes2['status']==200):
                     print("unmatch sucessful, removing db entry")
                     dbHandler.RemoveEntry(internal)
                 continue
@@ -275,10 +269,10 @@ def SwipeLoop():
                 else:
                     numberofswipes = 0
                     #print(bcolors.FAIL+"Set swipes to zero"+bcolors.ENDC)
-                #print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
+                print(bcolors.OKBLUE + "Number of swipes remaining: " + str(numberofswipes)+bcolors.ENDC)
             else:
                 returndata = tinder_api.dislike(ids[len(ids) - 1])
-                #print(bcolors.OKBLUE + "Dislked " + str(ids[len(ids) - 1]['name']) + bcolors.ENDC)
+                print(bcolors.FAIL + "Dislked " + str(ids[len(ids) - 1]['name']) + bcolors.ENDC)
             ids = ids[1:len(ids)-2]
         #checker hvornaar vi kan swipe igen
         if(timeToNextLike>time.time()*1000):

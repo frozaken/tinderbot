@@ -74,6 +74,7 @@ def get_self():
     try:
         url = config.host + '/profile'
         r = requests.get(url, headers=headers)
+        print(str(r))
         return r.json()
     except requests.exceptions.RequestException as e:
         print("Something went wrong. Could not get your data:", e)
