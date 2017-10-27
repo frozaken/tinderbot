@@ -89,7 +89,7 @@ def ChatLoop():
         ####FROM OUR DATABASE
         allInternalMatches = dbHandler.GetAll()
         for k  in range(0,len(allInternalMatches)):
-            print(str(k)+" out of "+str(len(allInternalMatches))+ " matches being checked")
+            #print(str(k)+" out of "+str(len(allInternalMatches))+ " matches being checked")
             internal = allInternalMatches[k]
             if(k%10==0):
                 print("Chat loop has checked %f percent of matches"%(k*100/(len(allInternalMatches)-1)))
