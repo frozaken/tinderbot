@@ -100,8 +100,10 @@ def ChatLoop():
                 matchinfo1 = tinder_api.match_info(internal['users'][0]['uid'])
                 matchinfo2 = tinder_api.match_info(internal['users'][1]['uid'])
                 if(matchinfo1['status'] != 200 or matchinfo2['status'] != 200):
-                    features.sleep(1)
-                    raise Exception("got timed out")
+                    if(matchinfo1['status'] == '404'):
+                        raise Exception(str(internal['users'][1]['uid']))
+                    if(matchinfo2['status'] == '404'):
+                        raise Exception(str(internal['users'][0]['uid']))
 
                 if (matchinfo1['results']['closed'] == True or matchinfo2['results']['closed'] == True):
                     print(bcolors.FAIL + "UNMATCHING" + bcolors.ENDC)
@@ -113,7 +115,11 @@ def ChatLoop():
 
 
             except Exception as e:
-                print("Error unmatching, %s"%e)
+                print("Error unmatching, %s, retrying"%e)
+                unRes = tinder_api.unmatch(e)
+                if(unRes['status']==200):
+                    print("unmatch sucessful, removing db entry")
+                    dbHandler.RemoveEntry(internal)
                 continue
 
             names=[]
