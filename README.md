@@ -1,2 +1,2 @@
-<h1>Tellers Tinderbot :)</h1>
-<h1>Rip tinderboys</h1>
+<h1>Match your tindermatches!</h1>
+<p>This bot, will match your matches, and let them write to oneanother. All you need to do, is set up a mongodb(preferrably on 127.0.0.1), enter you inforamtion in the config.py file, and load it up. The code is missing a lot of error checking, and is not designed to be clean, nor efficient. All in all, the code sucks... but it works.</p>
